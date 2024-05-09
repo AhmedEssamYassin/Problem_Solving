@@ -1,0 +1,48 @@
+----------------------------------------------------Examples on 1st case:----------------------------------------------------
+If input is: 13 24.6 A B and the variables are in this order: cin >> X >> Y >> ch1 >> ch2;
+std::cin extracts inputs as follows: 
+X : 13
+Y : 24.6
+ch1 : A
+ch2 : B
+----------------------------------------------
+If input is: 13 24.6 A B and the variables are in this order: cin >> Y >> X >> ch1 >> ch2;
+std::cin extracts inputs as follows: 
+X : 24
+Y : 13
+ch1 : .
+ch2 : 6
+----------------------------------------------
+If input is: 13 24.6 A B and the variables are in this order: cin >> X >> ch1 >> ch2 >> Y;
+std::cin extracts inputs as follows: 
+X : 13
+Y : 0.6
+ch1 : 2
+ch2 : 4
+----------------------------------------------
+If input is: 13 24.6 A B and the variables are in this order: cin >> Y >> ch1 >> X >> ch2;
+std::cin extracts inputs as follows: 
+X : 4
+Y : 13
+ch1 : 2
+ch2 : .
+----------------------------------------------------Examples on 2nd case:----------------------------------------------------
+In case we do NOT use std::cin.ignore(256,'\n'); The first string will consume the '\n' in the input stream buffer so it will appear empty!
+How many users would you like to insert?
+User's Name #1: 
+User's Name #2: Ahmed
+User's Name #3: Essam Ahmed
+-----------------------------------------------------------------
+In case we USE std::cin.ignore(256,'\n'); The first string will be filled normally
+How many users would you like to insert?
+User's Name #1: Ahmed
+User's Name #2: Essam Ahmed
+User's Name #3: Yassin Ahmed
+----------------------------------------------------Examples on 3rd case:----------------------------------------------------
+You have input incorrect data, please re-enter your input in a correct way: 
+You have input incorrect data, please re-enter your input in a correct way: 
+You have input incorrect data, please re-enter your input in a correct way: 
+ODD
+EVEN
+EVEN
+EVEN

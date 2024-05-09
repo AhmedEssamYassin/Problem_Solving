@@ -1,0 +1,26 @@
+---------------------------------------------Prefixes---------------------------------------------
+The Decimal_Number stored: 659
+The Octal_Number stored: 13
+The Hex_Number stored: 1068
+The Binary_Number stored: 58
+---------------------------------------------Suffixes---------------------------------------------
+-------------------------------------------For integers-------------------------------------------
+A long long int literal: 1234567890123456789
+An unsigned long long int literal: 12345678901234567890
+Automatic conversion to unsigned long long even without long long prefix: 12345678901234567890
+------------------------------------For floating-point numbers------------------------------------
+First case:
+X is float and compared to the literal 3.425 which is considered a double, thus, the condition (X == 3.425) evaluates to false
+They are NOT Equal!
+
+Second case:
+X is float and compared to the literal 3.425f which is considered a float, thus, the condition (X == 3.425) evaluates to true
+They are Equal!
+
+Third case:
+Y is double and compared to the literal 3.425 which is considered a double, thus, the condition (Y == 3.425) evaluates to true
+They are Equal!
+
+Fourth case:
+Z is float and compared to the literal 0.5 which is considered a double but its representation is the same as a float or a double, thus, the condition (Z == 0.5) evaluates to true
+They are Equal!
