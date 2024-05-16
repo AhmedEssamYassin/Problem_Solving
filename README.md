@@ -12,17 +12,23 @@ It contains problems on almost every topic you would like to train on such that:
 - Recursion
 - Prefix sum
 - Frequency array
+- Scanline algorithm
+- 2D scanline algorithm
+- Kaden's algorithm
 - STLS (vector, stack, queue, dequeue, set, map, ...etc.)
 - Two pointer technique
 - Binary search
 - Bitmasks
 - Number Theory (Too deep topics, detailed in separate point)
 - Dynamic programming
+- Matrix binary exponentiation
 - Segment tree
 - Lazy propagation
 - Binary indexed tree
 - Sparse table
+- merge sort
 - Coordinate compression
+- Trie data structure
 - Graph theory
 - Disjoint unions
 - Suffix arrays
