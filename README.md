@@ -30,7 +30,9 @@ It contains problems on almost every topic you would like to train on such that:
 - Coordinate compression
 - Trie data structure
 - Graph theory
-- Disjoint unions
+- DFS and BFS on graph
+- Minimum spanning tree (Kruksal and Prim's algorithms)
+- Disjoint set unions
 - Suffix arrays
 
 and so many topics to be added!
@@ -78,7 +80,6 @@ and so many topics to be added!
 - Depth of ETF to reach 1
 - Euler’s theorem: generalization of Fermat’s little theorem
 - Inverse of ETF
-- 
 ## How to follow up with this?
 Just make sure to try solving each problem first and do not see the solutions until you do your best.
 Good luck!
