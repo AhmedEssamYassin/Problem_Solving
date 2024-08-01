@@ -67,7 +67,7 @@ and so many topics to be added!
 - Prime number theory $π(N)$
 - Counting divisors: $σ_0$
     - Naïve method O(N)
-    - Trial division O($\sqrt{N})
+    - Trial division O($\sqrt{N}$)
     - Linear Sieve of Eratosthenes and LPF $O(N^{1/3})$    
     - Brent-Pollard-rho O($N^{1/4}$)
 - Sum of divisors: $σ_1$
