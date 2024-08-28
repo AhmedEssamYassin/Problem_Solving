@@ -31,6 +31,9 @@ It contains problems on almost every topic you would like to train on such that:
 - Trie data structure
 - Graph theory
 - DFS and BFS on graph
+- Shortest Path (Dijkstra)
+- Binary lifting (Kth Ancestor)
+- Lowest Common Ancestor (in O(log N))
 - Minimum spanning tree (Kruksal and Prim's algorithms)
 - Disjoint set unions
 - Suffix arrays
