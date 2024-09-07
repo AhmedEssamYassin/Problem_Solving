@@ -29,7 +29,10 @@ It contains problems on almost every topic you would like to train on such that:
 ##
 - Number Theory (Too deep topics, detailed in separate point)
 - Dynamic programming
+- Game Theory (Nim game and Sprague-Grundy numbers)
 - Matrix binary exponentiation
+##
+>[A very recommended repository on Data structures](https://github.com/HelanaNady/DataStructures)
 - Segment tree
 - Lazy propagation
 - Binary indexed tree
@@ -47,7 +50,6 @@ It contains problems on almost every topic you would like to train on such that:
 - Suffix arrays
 - KMP (Knuth–Morris–Pratt) algorithm
 - String Hashing (single and double hashing)
-- Game Theory (Nim game and Sprague-Grundy numbers)
 
 and so many topics to be added!
 
