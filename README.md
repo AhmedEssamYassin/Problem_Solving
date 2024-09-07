@@ -2,23 +2,31 @@
 
 This repository is dedicated for students (or anyone) starting to train problem solving for competitions such as XCPC's or similar and contests such that on [codeforces](https://codeforces.com/).
 It contains problems on almost every topic you would like to train on such that:
-- Input/Output
-- Conditional statements
-- Loops
-- Arrays
-- Functions
-- Strings
-- Mathematics (sequences, summations, geometry)
-- Recursion
-- Prefix sum
-- Frequency array
-- Scanline algorithm
-- 2D scanline algorithm
-- Kaden's algorithm
-- STLS (vector, stack, queue, dequeue, set, map, ...etc.)
-- Two pointer technique
-- Binary search
-- Bitmasks
+>[Assiut ICPC sheet Newcomers](https://github.com/AhmedEssamYassin/Probelm_Solving/tree/main/CP%20Sheets%20Solutions/ICPC%20Assiut%20-%20Newcomers)
+>
+>[Assiut ICPC sheet Advanced Newcomers](https://github.com/AhmedEssamYassin/Probelm_Solving/tree/main/CP%20Sheets%20Solutions/ICPC%20Assiut%20Advanced%20-%20Newcomers%202023)
+>- Input/Output
+>- Conditional statements
+>- Loops
+>- Arrays
+>- Functions
+>- Strings
+>- Mathematics (sequences, summations, geometry)
+>- Recursion
+##
+>[Assiut ICPC standard Juniors training](https://github.com/AhmedEssamYassin/Probelm_Solving/tree/main/CP%20Sheets%20Solutions/ICPC%20Assiut%20-%20Standard%20Juniors%20Phase%201)
+>
+>[Assiut ICPC Juniors  training]()
+>- Prefix sum
+>- Frequency array
+>- Scanline algorithm
+>- 2D scanline algorithm
+>- Kaden's algorithm
+>- STLS (vector, stack, queue, dequeue, set, map, ...etc.)
+>- Two pointer technique
+>- Binary search
+>- Bitmasks
+##
 - Number Theory (Too deep topics, detailed in separate point)
 - Dynamic programming
 - Matrix binary exponentiation
@@ -37,6 +45,9 @@ It contains problems on almost every topic you would like to train on such that:
 - Minimum spanning tree (Kruksal and Prim's algorithms)
 - Disjoint set unions
 - Suffix arrays
+- KMP (Knuth–Morris–Pratt) algorithm
+- String Hashing (single and double hashing)
+- Game Theory (Nim game and Sprague-Grundy numbers)
 
 and so many topics to be added!
 
@@ -89,5 +100,5 @@ Good luck!
 
 ## Contributing
 
-Pull requests are welcome. For major changes, please open an issue first
+Pull requests are welcomed. For major changes, please open an issue first
 to discuss what you would like to change.
