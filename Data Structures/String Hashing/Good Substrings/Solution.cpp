@@ -166,32 +166,32 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
 	int t = 1;
-	ll N;
+	ll N, k;
 	// cin >> t;
 	while (t--)
 	{
-		string str;
-		cin >> str;
-		pre(4e5);
-		HashRange HashString(str);
-		bool flag = false;
-		string ans;
-		for (int i = str.length() - 2, len = 2; i > 0; i--, len++)
+		string str, bad;
+		cin >> str >> bad >> k;
+		N = str.length();
+		pre(3000);
+		HashRange hash = str;
+		vector<Hash> good;
+		vector<ll> pref(N, 0);
+		pref[0] = !(bad[str[0] - 97] - '0');
+		for (int i{1}; i < N; i++)
+			pref[i] = pref[i - 1] + !(bad[str[i] - 97] - '0');
+		for (int i{}; i < N; i++)
 		{
-			Hash pref = HashString.get(0, len - 1);
-			Hash suf = HashString.get(i, str.length() - 1);
-			if (pref == suf && len + len > str.length())
+			for (int j = i; j < N; j++)
 			{
-				ans = str.substr(0, len);
-				flag = true;
-				break;
+				if (pref[j] - (i ? pref[i - 1] : 0) <= k)
+					good.push_back(hash.get(i, j));
 			}
 		}
-		if (flag)
-			cout << "YES\n"
-				 << ans;
-		else
-			cout << "NO";
+		int cnt{};
+		sort(good.begin(), good.end());
+		good.erase(unique(good.begin(), good.end()), good.end());
+		cout << good.size();
 	}
 	return 0;
 }

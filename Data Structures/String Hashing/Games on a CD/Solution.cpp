@@ -166,32 +166,52 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
 	int t = 1;
-	ll N;
+	ll N, k, g;
 	// cin >> t;
 	while (t--)
 	{
-		string str;
+		cin >> N >> k;
+		string str, T;
 		cin >> str;
-		pre(4e5);
-		HashRange HashString(str);
-		bool flag = false;
-		string ans;
-		for (int i = str.length() - 2, len = 2; i > 0; i--, len++)
+		str += str.substr(0, k - 1); // To make it cyclic
+		pre(4e6);
+		vector<vector<Hash>> arr(k);
+		HashRange hashStr = str;
+		for (int i = 0; i + k - 1 < str.size(); i++)
+			arr[i % k].push_back(hashStr.get(i, i + k - 1));
+
+		map<Hash, int> mp;
+		cin >> g;
+		for (int i = 1; i <= g; ++i)
 		{
-			Hash pref = HashString.get(0, len - 1);
-			Hash suf = HashString.get(i, str.length() - 1);
-			if (pref == suf && len + len > str.length())
+			cin >> str;
+			mp[Hash(str)] = i;
+		}
+
+		for (int i = 0; i < k; i++)
+		{
+			set<Hash> tr(arr[i].begin(), arr[i].end());
+			if (tr.size() == N)
 			{
-				ans = str.substr(0, len);
-				flag = true;
-				break;
+				vector<int> ans;
+				for (const auto &curr : arr[i])
+				{
+					bool isFound = mp.count(curr);
+					if (isFound)
+						ans.push_back(mp[curr]);
+					else
+						break;
+				}
+				if (ans.size() == N) // If found all N strings making the (N * K) cyclic string
+				{
+					cout << "YES\n";
+					for (const int &j : ans)
+						cout << j << " ";
+					return 0;
+				}
 			}
 		}
-		if (flag)
-			cout << "YES\n"
-				 << ans;
-		else
-			cout << "NO";
+		cout << "NO\n";
 	}
 	return 0;
 }

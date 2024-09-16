@@ -167,31 +167,40 @@ int main()
 #endif //! ONLINE_JUDGE
 	int t = 1;
 	ll N;
-	// cin >> t;
+	cin >> t;
+	pre(4e6);
 	while (t--)
 	{
 		string str;
 		cin >> str;
-		pre(4e5);
-		HashRange HashString(str);
-		bool flag = false;
-		string ans;
-		for (int i = str.length() - 2, len = 2; i > 0; i--, len++)
+		HashRange hashStr = str;
+		int lenPref = 0, lenSuff = 0;
+		N = str.length();
+		int L = 0, R = N - 1;
+		while (str[L] == str[R] && L < R)
+			L++, R--, lenPref++, lenSuff++;
+		int palPref = 0, palSuff = 0, l = L, r = R;
+		while (L < N - lenSuff)
 		{
-			Hash pref = HashString.get(0, len - 1);
-			Hash suf = HashString.get(i, str.length() - 1);
-			if (pref == suf && len + len > str.length())
-			{
-				ans = str.substr(0, len);
-				flag = true;
-				break;
-			}
+			if (hashStr.get(l, L) == hashStr.inv(l, L))
+				palPref = L - l + 1;
+			L++;
 		}
-		if (flag)
-			cout << "YES\n"
-				 << ans;
+
+		while (R > lenPref - 1)
+		{
+			if (hashStr.get(R, r) == hashStr.inv(R, r))
+				palSuff = r - R + 1;
+			R--;
+		}
+
+		cout << str.substr(0, lenPref);
+		if (palPref > palSuff)
+			cout << str.substr(lenPref, palPref);
 		else
-			cout << "NO";
+			cout << str.substr(r - palSuff + 1, palSuff);
+		cout << str.substr(r + 1);
+		cout << endl;
 	}
 	return 0;
 }

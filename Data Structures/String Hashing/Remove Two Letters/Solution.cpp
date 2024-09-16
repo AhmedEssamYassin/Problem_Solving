@@ -167,31 +167,22 @@ int main()
 #endif //! ONLINE_JUDGE
 	int t = 1;
 	ll N;
-	// cin >> t;
+	cin >> t;
+	pre(4e5);
 	while (t--)
 	{
+		cin >> N;
 		string str;
 		cin >> str;
-		pre(4e5);
-		HashRange HashString(str);
-		bool flag = false;
-		string ans;
-		for (int i = str.length() - 2, len = 2; i > 0; i--, len++)
+		HashRange rangeStr = str;
+		set<Hash> st;
+		for (int i{}; i < N - 1; i++)
 		{
-			Hash pref = HashString.get(0, len - 1);
-			Hash suf = HashString.get(i, str.length() - 1);
-			if (pref == suf && len + len > str.length())
-			{
-				ans = str.substr(0, len);
-				flag = true;
-				break;
-			}
+			Hash pref = (i ? rangeStr.get(0, i - 1) : Hash(""));
+			Hash suff = (i + 2 < N ? rangeStr.get(i + 2, N - 1) : Hash(""));
+			st.insert(pref + suff);
 		}
-		if (flag)
-			cout << "YES\n"
-				 << ans;
-		else
-			cout << "NO";
+		cout << st.size() << endl;
 	}
 	return 0;
 }

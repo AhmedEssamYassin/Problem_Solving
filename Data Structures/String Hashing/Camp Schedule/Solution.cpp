@@ -170,28 +170,60 @@ int main()
 	// cin >> t;
 	while (t--)
 	{
-		string str;
-		cin >> str;
-		pre(4e5);
-		HashRange HashString(str);
-		bool flag = false;
-		string ans;
-		for (int i = str.length() - 2, len = 2; i > 0; i--, len++)
+		string S, T;
+		cin >> S >> T;
+		int lenS = S.length();
+		int lenT = T.length();
+		if (lenS < lenT || lenT == 1)
+			return cout << S, 0;
+		////////////////////////
+
+		pre(6e5);
+		HashRange hashT = T;
+		// We need to overlap T as many times as possible, to increase occurrences
+		// To do this, we need to find the longest common suffix of T with a prefix of T
+
+		int maxCommonLength{};
+		for (int i{}; i < lenT - 1; i++) // Can't take the whole string T as an overlap
 		{
-			Hash pref = HashString.get(0, len - 1);
-			Hash suf = HashString.get(i, str.length() - 1);
-			if (pref == suf && len + len > str.length())
-			{
-				ans = str.substr(0, len);
-				flag = true;
-				break;
-			}
+			if (hashT.get(0, i) == hashT.get(lenT - i - 1, lenT - 1))
+				maxCommonLength = i + 1;
 		}
-		if (flag)
-			cout << "YES\n"
-				 << ans;
-		else
-			cout << "NO";
+		////////////////////////
+
+		ll ones{}, zeros{};
+		for (const char &C : S)
+			ones += (C == '1'), zeros += (C == '0');
+		string ans(T);
+		// 101110
+		//     101110
+		//         101110
+		for (const char &C : T)
+			ones -= (C == '1'), zeros -= (C == '0');
+
+		string add = T.substr(maxCommonLength);
+		ll minusOnes{}, minusZeros{};
+		for (const char &C : add)
+			minusOnes += (C == '1'), minusZeros += (C == '0');
+
+		while (ones > 0 && zeros > 0)
+		{
+			ans += add;
+			ones -= minusOnes;
+			zeros -= minusZeros;
+		}
+
+		while (ones < 0) // Remove any extra ones
+			zeros += (ans.back() == '0'), ones += (ans.back() == '1'), ans.pop_back();
+		while (zeros < 0) // Remove any extra zeros
+			ones += (ans.back() == '1'), zeros += (ans.back() == '0'), ans.pop_back();
+
+		if (zeros > 0) // Add any remaining zeros
+			ans += string(zeros, '0');
+		if (ones > 0) // Add any remaining ones
+			ans += string(ones, '1');
+
+		cout << ans;
 	}
 	return 0;
 }

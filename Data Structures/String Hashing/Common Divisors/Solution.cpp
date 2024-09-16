@@ -170,28 +170,23 @@ int main()
 	// cin >> t;
 	while (t--)
 	{
-		string str;
-		cin >> str;
-		pre(4e5);
-		HashRange HashString(str);
-		bool flag = false;
-		string ans;
-		for (int i = str.length() - 2, len = 2; i > 0; i--, len++)
+		string s, t;
+		cin >> s >> t;
+		pre(max(s.length(), t.length()));
+		HashRange HashStringS(s);
+		HashRange HashStringT(t);
+		ll cnt{}, len = 1, lenS = s.length(), lenT = t.length();
+		for (int i{}; i < min(lenS, lenT); i++, len++)
 		{
-			Hash pref = HashString.get(0, len - 1);
-			Hash suf = HashString.get(i, str.length() - 1);
-			if (pref == suf && len + len > str.length())
+			Hash curS = HashStringS.get(0, i);
+			Hash curT = HashStringT.get(0, i);
+			if (lenS % len == 0 && lenT % len == 0 && curS == curT)
 			{
-				ans = str.substr(0, len);
-				flag = true;
-				break;
+				if (HashStringS.get(len, lenS - 1) == HashStringS.get(0, lenS - len - 1) && HashStringT.get(len, lenT - 1) == HashStringT.get(0, lenT - len - 1))
+					cnt++;
 			}
 		}
-		if (flag)
-			cout << "YES\n"
-				 << ans;
-		else
-			cout << "NO";
+		cout << cnt;
 	}
 	return 0;
 }

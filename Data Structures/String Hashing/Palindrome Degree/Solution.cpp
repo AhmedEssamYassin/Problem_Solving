@@ -172,26 +172,24 @@ int main()
 	{
 		string str;
 		cin >> str;
-		pre(4e5);
-		HashRange HashString(str);
-		bool flag = false;
-		string ans;
-		for (int i = str.length() - 2, len = 2; i > 0; i--, len++)
+		Hash pref, invPref;
+		N = str.length();
+		pre(N);
+		vector<ll> dp(N, 0);
+		dp[0] = 1;
+		pref = pref + str[0];
+		invPref = str[0] + invPref;
+		ll ans{1};
+		for (int i{1}; i < N; i++)
 		{
-			Hash pref = HashString.get(0, len - 1);
-			Hash suf = HashString.get(i, str.length() - 1);
-			if (pref == suf && len + len > str.length())
-			{
-				ans = str.substr(0, len);
-				flag = true;
-				break;
-			}
+			// It's a palindrome itself pref = invPref
+			pref = pref + str[i];
+			invPref = str[i] + invPref;
+			if (pref == invPref)
+				dp[i] = (dp[(i - 1) / 2] + 1);
+			ans += dp[i];
 		}
-		if (flag)
-			cout << "YES\n"
-				 << ans;
-		else
-			cout << "NO";
+		cout << ans;
 	}
 	return 0;
 }

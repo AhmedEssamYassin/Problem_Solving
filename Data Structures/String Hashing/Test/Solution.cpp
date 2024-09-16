@@ -157,6 +157,31 @@ struct HashRange
 };
 ////////////////////////////////////////////////////////////////////////////////////
 
+ll tryPermutation(string S[], ll ans)
+{
+	HashRange hashS[3] = {S[0], S[1], S[2]};
+	int L = 0, R = S[0].length() - 1, cnt{}, len = S[0].length() + S[1].length();
+	while (L < S[1].length() && R >= 0)
+	{
+		if (hashS[0].get(R, S[0].length() - 1) == hashS[1].get(0, L))
+			cnt = L + 1;
+		L++, R--;
+	}
+	ans -= cnt;
+	len -= cnt;
+	HashRange overLapHash(S[0].substr(0, S[0].length() - cnt) + S[1]);
+	/////////////////////////////////////////////////////////////////////////////////
+	L = 0, R = len - 1, cnt = 0;
+	while (L < S[2].length() && R >= 0)
+	{
+		if (overLapHash.get(R, len - 1) == hashS[2].get(0, L))
+			cnt = L + 1;
+		L++, R--;
+	}
+	ans -= cnt;
+	return ans;
+}
+
 int main()
 {
 	ios_base::sync_with_stdio(false);
@@ -166,32 +191,42 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
 	int t = 1;
-	ll N;
+	ll N, Q;
 	// cin >> t;
 	while (t--)
 	{
-		string str;
-		cin >> str;
-		pre(4e5);
-		HashRange HashString(str);
-		bool flag = false;
-		string ans;
-		for (int i = str.length() - 2, len = 2; i > 0; i--, len++)
-		{
-			Hash pref = HashString.get(0, len - 1);
-			Hash suf = HashString.get(i, str.length() - 1);
-			if (pref == suf && len + len > str.length())
-			{
-				ans = str.substr(0, len);
-				flag = true;
-				break;
-			}
-		}
-		if (flag)
-			cout << "YES\n"
-				 << ans;
-		else
-			cout << "NO";
+		string S[3];
+		cin >> S[0] >> S[1] >> S[2];
+		pre(1e5);
+
+		// S1 S2 S3
+		// S1 S3 S2
+		// S2 S1 S3
+		// S2 S3 S1
+		// S3 S1 S2
+		// S3 S2 S1
+		// Try all permutations and choose the minimum answer
+		// If a string is totally contained in another one, just delete it
+		if (S[0].find(S[1]) != -1)
+			S[1] = "";
+		if (S[0].find(S[2]) != -1)
+			S[2] = "";
+		if (S[1].find(S[0]) != -1)
+			S[0] = "";
+		if (S[1].find(S[2]) != -1)
+			S[2] = "";
+		if (S[2].find(S[0]) != -1)
+			S[0] = "";
+		if (S[2].find(S[1]) != -1)
+			S[1] = "";
+		ll ans = S[0].length() + S[1].length() + S[2].length();
+		ll originalAns = ans;
+		sort(S, S + 3); // To get All permutations
+		do
+			ans = min(tryPermutation(S, originalAns), ans);
+		while (next_permutation(S, S + 3));
+
+		cout << ans;
 	}
 	return 0;
 }

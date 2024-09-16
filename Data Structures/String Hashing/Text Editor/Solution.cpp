@@ -157,6 +157,17 @@ struct HashRange
 };
 ////////////////////////////////////////////////////////////////////////////////////
 
+bool isOk(const HashRange &hashA, const Hash &pref, int lenA, int curLen, int N)
+{
+	int cnt{};
+	for (int i{}; i <= lenA - curLen; i++) // 5 2
+	{
+		if (hashA.get(i, i + curLen - 1) == pref)
+			cnt++;
+	}
+	return (cnt >= N);
+}
+
 int main()
 {
 	ios_base::sync_with_stdio(false);
@@ -166,32 +177,32 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
 	int t = 1;
-	ll N;
+	ll N, Q;
 	// cin >> t;
 	while (t--)
 	{
-		string str;
-		cin >> str;
-		pre(4e5);
-		HashRange HashString(str);
-		bool flag = false;
-		string ans;
-		for (int i = str.length() - 2, len = 2; i > 0; i--, len++)
+		string A, B;
+		getline(cin, A);
+		getline(cin, B);
+		cin >> N;
+		pre(100000);
+		HashRange hashA(A), hashB(B);
+		vector<ll> len(B.length());
+		iota(len.begin(), len.end(), 1);
+
+		int maxLen = 0, L = 0, R = len.size() - 1;
+		while (L <= R)
 		{
-			Hash pref = HashString.get(0, len - 1);
-			Hash suf = HashString.get(i, str.length() - 1);
-			if (pref == suf && len + len > str.length())
-			{
-				ans = str.substr(0, len);
-				flag = true;
-				break;
-			}
+			int mid = ((L + R) >> 1);
+			if (isOk(hashA, hashB.get(0, len[mid] - 1), A.length(), len[mid], N))
+				maxLen = len[mid], L = mid + 1;
+			else
+				R = mid - 1;
 		}
-		if (flag)
-			cout << "YES\n"
-				 << ans;
+		if (maxLen)
+			cout << B.substr(0, maxLen);
 		else
-			cout << "NO";
+			cout << "IMPOSSIBLE";
 	}
 	return 0;
 }
