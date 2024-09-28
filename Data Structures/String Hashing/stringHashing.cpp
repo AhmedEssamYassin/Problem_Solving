@@ -2,12 +2,17 @@
 using namespace std;
 #define ll long long int
 #define endl "\n"
-std::mt19937 rnd(time(nullptr));
+
+auto random_address = []
+{ char *p = new char; delete p; return uint64_t(p); };
+const uint64_t SEED = chrono::steady_clock::now().time_since_epoch().count() * (random_address() | 1);
+std::mt19937 rnd(SEED);
 #define rng(l, r) uniform_int_distribution<int64_t>(l, r)(rnd)
 
 /*
 Large Primes for hash
 1000000007
+For all coming primes use __int128_t in mult64()
 10000000019
 100000000003
 1000000000039
@@ -17,14 +22,16 @@ Large Primes for hash
 10000000000000061
 2305843009213693951 = (1LL << 61) - 1
 */
-constexpr ll mod = (1LL << 61) - 1; // Large prime,
+
+// constexpr ll mod = (1LL << 61) - 1; // Large prime,
 // Takes more time, choose a smaller prime and omit mult64() for faster code but higher probability of collision
-// constexpr ll mod = 1e9 + 7; // Is usually sufficient for most of the hashing problems
+constexpr ll mod = 1e9 + 7; // Is usually sufficient for most of the hashing problems
 
 inline ll mult64(const ll &a, const ll &b)
 {
-    return __int128_t(a) * b % mod;
+    return (a)*b % mod; // Cast to __int128_t if mod > 1e9
 }
+
 ll modPow(ll N, ll power, ll mod)
 {
     ll res{1};
@@ -37,7 +44,7 @@ ll modPow(ll N, ll power, ll mod)
     }
     return res;
 }
-ll b1 = rng(100, 1000), b2 = rng(100, 1000);
+ll b1 = rng(100, 1000000000), b2 = rng(1000, 1000000000);
 ll b1I = modPow(b1, mod - 2, mod), b2I = modPow(b2, mod - 2, mod);
 vector<ll> Pb1, Pb2, sumB1, sumB2;
 void pre(ll maxSize)
@@ -153,6 +160,13 @@ struct HashRange
         return Hash({(s[l].code.first - mult64(s[r + 1].code.first, Pb1[r - l + 1]) + mod) % mod,
                      (s[l].code.second - mult64(s[r + 1].code.second, Pb2[r - l + 1]) + mod) % mod},
                     r - l + 1);
+    }
+    void concatenate(const string &t)
+    {
+        if (t.empty())
+            return;
+        for (int i = 0; i < t.size(); i++)
+            p.push_back(p.back() + t[i]);
     }
 };
 ////////////////////////////////////////////////////////////////////////////////////
