@@ -3,44 +3,118 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
+int n;
 struct Trie
 {
     struct Node
     {
         Node *character[26];
-        int prefix, end;
+        set<int> idxPref, idxEnd; // To maintain indices of strings having prefixes or ending at each node
+        int prefix, isEnd;        // To count prefixes and strings ending at each node
         Node()
         {
             prefix = 0;
-            end = 0;
-            memset(character, NULL, sizeof(character));
+            isEnd = 0;
+            for (int i{}; i < 26; i++)
+                character[i] = nullptr;
         }
     };
-    Node *root = new Node();
-    void insert(const string &str)
+
+    Node *root;
+    Trie()
+    {
+        root = new Node();
+    }
+
+    void insert(const string &str, int j)
     {
         Node *cur = root;
         for (const char &C : str)
         {
             int idx = (C - 'a'); // To be 0-based index
-            if (cur->character[idx] == 0)
+            if (cur->character[idx] == nullptr)
                 cur->character[idx] = new Node();
+
             cur = cur->character[idx];
             cur->prefix++;
+            cur->idxPref.insert(j); // A string of index j has a prefix at this node
         }
-        cur->end++;
+        cur->isEnd++;
+        cur->idxEnd.insert(j); // A string of index j is ending at this node
     }
-    int count(const string &str)
+
+    // Is there any prefix of `str` occurs in a string in range [L, R]
+    bool searchPrefix(const string &str, int L, int R)
     {
         Node *cur = root;
         for (const char &C : str)
         {
             int idx = (C - 'a');
-            if (cur->character[idx] == 0)
-                return 0;
+            if (cur->character[idx] == nullptr)
+                return false;
+            // Character exists, but is it end of word?
+            cur = cur->character[idx];
+            auto &st = cur->idxEnd;
+            if (st.lower_bound(L) != st.end() && *st.lower_bound(L) <= R)
+                return true;
+        }
+        return false;
+    }
+
+    // Checks if `str` is a prefix of any string (or in range [L, R])
+    // Can also return a boolean, or even the actual number of string having `str` as a prefix
+    ll checkPrefix(const string &str, int L = 0, int R = n - 1)
+    {
+        Node *cur = root;
+        for (const char &C : str)
+        {
+            int idx = (C - 'a');
+            if (cur->character[idx] == nullptr)
+                return false;
             cur = cur->character[idx];
         }
+        // auto &st = cur->idxPref;
+        // return (st.lower_bound(L) != st.end() && *st.lower_bound(L) <= R);
         return cur->prefix;
+    }
+
+    // Checks if a node is a leaf node (doesn't have any children)
+    bool isLeaf(Node *root)
+    {
+        for (int i = 0; i < 26; i++)
+            if (root->character[i])
+                return false;
+        return true;
+    }
+
+    // Recursive function to delete a key from given Trie
+    void erase(Node *&node, int pos)
+    {
+        node->idxPref.erase(pos);
+        node->prefix--;
+        if (node->idxEnd.find(pos) != node->idxEnd.end())
+        {
+            node->idxEnd.erase(pos);
+            node->isEnd--;
+            return;
+        }
+        for (auto *&child : node->character)
+        {
+            if (child != nullptr && child->idxPref.find(pos) != child->idxPref.end())
+            {
+                erase(child, pos);
+                return;
+            }
+        }
+    }
+    ~Trie()
+    {
+        for (auto *&child : root->character)
+        {
+            if (child != nullptr)
+                delete (child);
+        }
+        delete (root);
     }
 };
 
@@ -62,10 +136,10 @@ struct binaryTrie
     {
         insert(0);
     }
-    void insert(int n)
+    void insert(ll n)
     {
         Node *cur = root;
-        for (int i = 30; i >= 0; i--)
+        for (int i = 30; i >= 0; i--) // change 30 based on number of bits in maximum number
         {
             int idx = ((n >> i) & 1); // same as (n & (1 << i)), but this avoids any overflow
             if (cur->child[idx] == 0)
@@ -74,7 +148,7 @@ struct binaryTrie
             cur = cur->child[idx];
         }
     }
-    void erase(int n, int i, Node *cur)
+    void erase(ll n, int i, Node *cur)
     {
         if (i == -1)
             return;
@@ -87,13 +161,13 @@ struct binaryTrie
             cur->child[idx] = NULL;
         }
     }
-    int maxXor(int n)
+    ll maxXor(ll n)
     {
         Node *cur = root;
-        int ret = 0;
-        for (int i = 30; i >= 0; i--)
+        ll ret = 0;
+        for (int i = 30; i >= 0; i--) // change 30 based on number of bits in maximum number
         {
-            int idx = ((n >> i) & 1);
+            ll idx = ((n >> i) & 1); // same as (n & (1 << i)), but this avoids any overflow
             if (cur->child[idx ^ 1] != 0)
                 cur = cur->child[idx ^ 1], ret |= (1 << i);
             else
@@ -118,16 +192,17 @@ int main()
     while (t--)
     {
         cin >> N >> Q;
-        Trie letterTree;
-        while (N--)
+        n = N;
+        Trie trie;
+        for (int i{}; i < N; i++)
         {
             cin >> str;
-            letterTree.insert(str);
+            trie.insert(str, i);
         }
         while (Q--)
         {
             cin >> str;
-            cout << letterTree.count(str) << endl;
+            cout << trie.checkPrefix(str) << endl;
         }
     }
     return 0;

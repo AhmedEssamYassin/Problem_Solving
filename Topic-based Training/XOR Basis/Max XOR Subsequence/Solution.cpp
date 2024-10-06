@@ -7,7 +7,7 @@ const int BITS = 64;
 struct XORBasis
 {
     int sz = 0;
-    int basis[BITS]{};
+    array<ll, BITS> basis{}; // Better to avoid SHALLOW COPYING
 
     void insertVector(ll x)
     {
@@ -85,7 +85,7 @@ struct XORBasis
     {
         if (!sz)
             return;
-        memset(basis, 0, sizeof(basis));
+        basis.fill(0);
         sz = 0;
     }
 };

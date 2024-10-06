@@ -1,11 +1,6 @@
-#ifdef ONLINE_JUDGE
-#pragma GCC optimize("Ofast,O3,unroll-loops")
-#pragma GCC target("avx,avx2,popcnt")
-#endif
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long int
-#define i128 __int128_t
 #define endl "\n"
 
 class compressedRange
