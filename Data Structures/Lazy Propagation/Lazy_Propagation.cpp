@@ -16,16 +16,16 @@ private:
         Node(const ll &N) : value(N) {}
         Node operator+(const Node &RHS)
         {
-            value = (value + RHS.value);
+            value += RHS.value;
             return *this;
         }
     };
     int size;
-    vector<Node> seg, lazy;
+    vector<Node> seg;
+    vector<Node> lazy;
     Node merge(const Node &leftNode, const Node &rightNode)
     {
-        Node res;
-        res.value = (leftNode.value + rightNode.value);
+        Node res = (leftNode.value + rightNode.value);
         return res;
     }
     void build(int left, int right, int node, const vector<ll> &arr)
@@ -35,28 +35,28 @@ private:
         {
             if (left < arr.size())
                 seg[node] = arr[left];
+            return;
         }
-        else
-        {
-            // Recursively build the left child
-            build(left, mid, L, arr);
-            // Recursively build the right child
-            build(mid + 1, right, R, arr);
-            // Merge the children values
-            seg[node] = merge(seg[L], seg[R]);
-        }
+        // Recursively build the left child
+        build(left, mid, L, arr);
+        // Recursively build the right child
+        build(mid + 1, right, R, arr);
+        // Merge the children values
+        seg[node] = merge(seg[L], seg[R]);
     }
     void push(int left, int right, int node)
     {
         // Propagate the value
-        seg[node] = (seg[node] + lazy[node]);
+        if (lazy[node].value == 0)
+            return;
+        seg[node].value += (right - left + 1) * lazy[node].value;
         // If the node is not a leaf
         if (left != right)
         {
             // Update the lazy values for the left child
-            lazy[L] = (lazy[L] + lazy[node]);
+            lazy[L].value += lazy[node].value;
             // Update the lazy values for the right child
-            lazy[R] = (lazy[R] + lazy[node]);
+            lazy[R].value += lazy[node].value;
         }
         // Reset the lazy value
         lazy[node] = 0;
@@ -65,40 +65,37 @@ private:
     {
         push(left, right, node);
         // If the range is invalid, return
-        if (leftQuery > rightQuery)
+        if (left > rightQuery || right < leftQuery)
             return;
         // If the range matches the segment
         if (left >= leftQuery && right <= rightQuery)
         {
             // Update the lazy value
-            lazy[node] = (lazy[node] + val);
-
+            lazy[node].value += val;
             // Apply the update immediately
             push(left, right, node);
+            return;
         }
-        else
-        {
-            // Recursively update the left child
-            update(left, mid, L, leftQuery, min(rightQuery, mid), val);
-            // Recursively update the right child
-            update(mid + 1, right, R, max(leftQuery, mid + 1), rightQuery, val);
-            // Merge the children values
-            seg[node] = merge(seg[L], seg[R]);
-        }
+        // Recursively update the left child
+        update(left, mid, L, leftQuery, rightQuery, val);
+        // Recursively update the right child
+        update(mid + 1, right, R, leftQuery, rightQuery, val);
+        // Merge the children values
+        seg[node] = merge(seg[L], seg[R]);
     }
     Node query(int left, int right, int node, int leftQuery, int rightQuery)
     {
         // Apply the pending updates if any
         push(left, right, node);
         // If the range is invalid, return a value that does NOT to affect other queries
-        if (leftQuery > rightQuery || left > rightQuery || right < leftQuery)
+        if (left > rightQuery || right < leftQuery)
             return 0;
 
         // If the range matches the segment
         if (left >= leftQuery && right <= rightQuery)
             return seg[node];
 
-        return merge(query(left, mid, L, leftQuery, min(rightQuery, mid)), query(mid + 1, right, R, max(leftQuery, mid + 1), rightQuery));
+        return merge(query(left, mid, L, leftQuery, rightQuery), query(mid + 1, right, R, leftQuery, rightQuery));
     }
 
 public:

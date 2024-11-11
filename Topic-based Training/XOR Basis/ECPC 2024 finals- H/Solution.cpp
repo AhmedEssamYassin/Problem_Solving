@@ -165,7 +165,7 @@ private:
 	{
 		push(left, right, node);
 		// If the range is invalid, return
-		if (leftQuery > rightQuery)
+		if (left > rightQuery || right < leftQuery)
 			return;
 		// If the range matches the segment
 		if (left >= leftQuery && right <= rightQuery)
@@ -179,9 +179,9 @@ private:
 		else
 		{
 			// Recursively update the left child
-			rangeUpdate(left, mid, L, leftQuery, min(rightQuery, mid), val);
+			rangeUpdate(left, mid, L, leftQuery, rightQuery, val);
 			// Recursively update the right child
-			rangeUpdate(mid + 1, right, R, max(leftQuery, mid + 1), rightQuery, val);
+			rangeUpdate(mid + 1, right, R, leftQuery, rightQuery, val);
 			// Merge the children values
 			seg[node] = merge(seg[L], seg[R]);
 		}
@@ -209,15 +209,15 @@ private:
 		// Apply the pending updates if any
 		push(left, right, node);
 		// If the range is invalid, return a value that does NOT to affect other queries
-		if (leftQuery > rightQuery || left > rightQuery || right < leftQuery)
+		if (left > rightQuery || right < leftQuery)
 			return 0;
 
 		// If the range matches the segment
 		if (left >= leftQuery && right <= rightQuery)
 			return seg[node];
 
-		Node getLeftQuery = query(left, mid, L, leftQuery, min(rightQuery, mid));
-		Node getRightQuery = query(mid + 1, right, R, max(leftQuery, mid + 1), rightQuery);
+		Node getLeftQuery = query(left, mid, L, leftQuery, rightQuery);
+		Node getRightQuery = query(mid + 1, right, R, leftQuery, rightQuery);
 		return merge(getLeftQuery, getRightQuery);
 	}
 

@@ -2,9 +2,12 @@
 using namespace std;
 #define ll long long int
 #define endl "\n"
-std::mt19937 rnd(time(nullptr));
-#define rng(l, r) uniform_int_distribution<int64_t>(l, r)(rnd)
 
+auto random_address = []
+{ char *p = new char; delete p; return uint64_t(p); };
+const uint64_t SEED = chrono::steady_clock::now().time_since_epoch().count() * (random_address() | 1);
+std::mt19937 rnd(SEED);
+#define rng(l, r) uniform_int_distribution<int64_t>(l, r)(rnd)
 /*
 Large Primes for hash
 1000000007
@@ -37,7 +40,7 @@ ll modPow(ll N, ll power, ll mod)
 	}
 	return res;
 }
-ll b1 = rng(100, 1000), b2 = rng(100, 1000);
+ll b1 = rng(100, 100000), b2 = rng(100, 100000);
 ll b1I = modPow(b1, mod - 2, mod), b2I = modPow(b2, mod - 2, mod);
 vector<ll> Pb1, Pb2, sumB1, sumB2;
 void pre(ll maxSize)
@@ -222,7 +225,7 @@ private:
 	{
 		push(left, right, node);
 		// If the range is invalid, return
-		if (leftQuery > rightQuery)
+		if (left > rightQuery || right < leftQuery)
 			return;
 		// If the range matches the segment
 		if (left >= leftQuery && right <= rightQuery)
@@ -236,9 +239,9 @@ private:
 		else
 		{
 			// Recursively update the left child
-			update(left, mid, L, leftQuery, min(rightQuery, mid), val);
+			update(left, mid, L, leftQuery, rightQuery, val);
 			// Recursively update the right child
-			update(mid + 1, right, R, max(leftQuery, mid + 1), rightQuery, val);
+			update(mid + 1, right, R, leftQuery, rightQuery, val);
 			// Merge the children values
 			seg[node] = merge(seg[L], seg[R]);
 		}
@@ -248,14 +251,14 @@ private:
 		// Apply the pending updates if any
 		push(left, right, node);
 		// If the range is invalid, return a value that does NOT to affect other queries
-		if (leftQuery > rightQuery || left > rightQuery || right < leftQuery)
+		if (left > rightQuery || right < leftQuery)
 			return 0;
 
 		// If the range matches the segment
 		if (left >= leftQuery && right <= rightQuery)
 			return seg[node];
-		Node leftSegment = query(left, mid, L, leftQuery, min(rightQuery, mid));
-		Node rightSegment = query(mid + 1, right, R, max(leftQuery, mid + 1), rightQuery);
+		Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
+		Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
 		return merge(leftSegment, rightSegment);
 	}
 
