@@ -4,12 +4,11 @@
 #include <iostream>
 using namespace __gnu_pbds;
 using namespace std;
-typedef tree<int, null_type, less<int>, rb_tree_tag,
-             tree_order_statistics_node_update>
-    ordered_set;
-typedef tree<int, null_type, less_equal<int>, rb_tree_tag,
-             tree_order_statistics_node_update>
-    ordered_multiset;
+template <typename T>
+using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+template <typename T>
+using ordered_multiset = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
 #include <bits/stdc++.h>
 #define ll long long int
 #define endl "\n"
