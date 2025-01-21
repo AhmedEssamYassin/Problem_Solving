@@ -10,14 +10,16 @@ public:
     int N;
     vector<vector<ll>> adj;
     vector<vector<ll>> capacity;
-    vector<vector<ll>> paths;
-    vector<deque<ll>> flowEdges;
+    /*
+    It's possible to determine matchings using only the capacity matrix without maintaining a separate matrix.
+    After finding the maximum flow, the capacity matrix is updated to reflect residual capacities.
+    Reverse edges in the residual graph indicate the matched pairs.
+    */
     vector<bool> visited;
     maxFlow(int _N)
     {
         N = _N;
         adj.assign(N + 1, vector<ll>());
-        flowEdges.assign(N + 1, deque<ll>());
         visited.assign(N + 1, false);
         capacity.assign(N + 1, vector<ll>(N + 1, 0));
     }
@@ -28,8 +30,8 @@ public:
         adj[v].push_back(u); // Reverse edge for residual graph
         // To handle multiple edges make it +=
         // Capacity of 1 in the graph and residual graph means that it is Unweighted
-        capacity[u][v] = cap;
-        capacity[v][u] = cap; // if the graph is Undirected
+        capacity[u][v] += cap;
+        // capacity[v][u] = cap;// if the graph is Undirected
     }
 
     ll BFS(int source, int sink, vector<ll> &parents)
@@ -80,70 +82,6 @@ public:
         }
         return flow;
     }
-    void dfs(vector<ll> &path, int node, int sink)
-    {
-        path.push_back(node); // Add the current node to the path
-        if (node == sink)
-        {
-            paths.push_back(path);
-            return;
-        }
-        dfs(path, flowEdges[node].front(), sink);
-        flowEdges[node].pop_front();
-    }
-    void extractPaths(vector<array<ll, 2>> &orgEdges, int src, int sink)
-    {
-        for (const auto &[u, v] : orgEdges)
-            capacity[u][v]--;
-        for (int u = 1; u <= sink; u++)
-        {
-            for (int v = 1; v <= sink; v++)
-            {
-                if (capacity[u][v] < 0)
-                    flowEdges[u].push_back(v); // adding the edge
-            }
-        }
-        while (!flowEdges[src].empty())
-        {
-            vector<ll> path;
-            dfs(path, src, sink);
-        }
-    }
-    // Find reachable nodes using DFS on the residual graph
-    void minCutDFS(vector<bool> &visited, ll node)
-    {
-        visited[node] = true;
-        for (ll next : adj[node])
-        {
-            if (!visited[next] && capacity[node][next] > 0)
-                minCutDFS(visited, next); // Unvisited and residual capacity > 0
-        }
-    }
-
-    // Find reachable nodes using BFS on the residual graph
-    vector<bool> findReachable(int N, int src)
-    {
-        vector<bool> visited(N + 1, false);
-        queue<int> q;
-        q.push(src);
-        visited[src] = true;
-
-        while (!q.empty())
-        {
-            int cur = q.front();
-            q.pop();
-
-            for (auto &next : adj[cur])
-            {
-                if (!visited[next] && capacity[cur][next] > 0)
-                {
-                    visited[next] = true;
-                    q.push(next);
-                }
-            }
-        }
-        return visited;
-    }
 };
 
 int main()
@@ -155,33 +93,44 @@ int main()
     freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
     int t = 1;
-    ll N, M;
+    ll N, M, K;
     // cin >> t;
     while (t--)
     {
-        cin >> N >> M;
-        ll src = 1, sink = N;
+        cin >> N >> M >> K;
+        ll src = 0, sink = N + M + 1;
         maxFlow maxflow(sink + 1);
-        while (M--)
+        // Potential pairs (edges in the bipartite graph)
+        while (K--)
         {
             ll u, v;
             cin >> u >> v;
             // Graph is directed and Unweighted
-            // Capacity of 1 in the graph and residual graph means that it is Unweighted
-            maxflow.addEdge(u, v, 1);
+            // u is a boy, v is a girl (They are already two different sets)
+            maxflow.addEdge(u, v + N, 1);
         }
+        // Transforming the bipartite graph to a network
+        // We will add nodes 0 (source) and (N + M + 1) (sink) to the graph
+
+        // Add edges from source to boys
+        for (ll i = 1; i <= N; i++)
+            maxflow.addEdge(src, i, 1);
+
+        // Add edges from girls to sink
+        for (ll i = N + 1; i <= N + M; i++)
+            maxflow.addEdge(i, sink, 1);
         cout << maxflow.Edmond_Karp(src, sink) << endl;
-        vector<bool> reachable = maxflow.findReachable(N, src);
-        // maxflow.dfs(reachable, 1);
-        for (int u = 1; u <= N; u++)
+        vector<pair<ll, ll>> pairs;
+        for (int i = 1; i <= N; i++)
         {
-            for (auto &v : maxflow.adj[u])
+            for (int j = N + 1; j <= N + M; j++)
             {
-                if (reachable[u] && !reachable[v])
-                    // u is reachable but v is not
-                    cout << u << " " << v << endl;
+                if (maxflow.capacity[j][i] > 0)
+                    pairs.push_back({i, j - N});
             }
         }
+        for (const auto &[boy, girl] : pairs)
+            cout << boy << " " << girl << endl;
     }
     return 0;
 }

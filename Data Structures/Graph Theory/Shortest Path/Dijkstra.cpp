@@ -2,14 +2,13 @@
 using namespace std;
 #define ll long long int
 #define endl "\n"
+#define INF LLONG_MAX
 
-// https://www.spoj.com/problems/EZDIJKST/
-// https://codeforces.com/contest/20/problem/C
 struct Edge
 {
     ll node = -1;
     ll par = -1; // parent
-    ll cost = LLONG_MAX;
+    ll cost = INF;
     Edge(ll node, ll weight, ll par = -1) : node(node), cost(weight), par(par) {}
     bool operator<(const Edge &E) const
     {
@@ -19,7 +18,7 @@ struct Edge
 
 void Dijkstra(const vector<Edge> graph[], int N, int src, int dest)
 {
-    vector<ll> dist(N + 1, -1), parent(N + 1, -1);
+    vector<ll> dist(N + 1, INF), parent(N + 1, -1);
     priority_queue<Edge> prQue;
     prQue.emplace(src, 0);
     while (!prQue.empty())
@@ -32,12 +31,12 @@ void Dijkstra(const vector<Edge> graph[], int N, int src, int dest)
         if (cur.node == dest)
             return void(cout << cur.cost << endl);
         */
-        if (dist[cur.node] != -1)
+        if (dist[cur.node] != INF)
             continue;
         dist[cur.node] = cur.cost;
         parent[cur.node] = cur.par;
         for (const Edge &v : graph[cur.node])
-            if (dist[v.node] == -1)
+            if (dist[v.node] == INF)
                 prQue.emplace(v.node, v.cost + cur.cost, cur.node);
     }
     // If there were NO path from src to dest

@@ -8,15 +8,13 @@ struct Trie
 {
     struct Node
     {
-        Node *character[26];
+        map<char, Node *> character;
         set<int> idxPref, idxEnd; // To maintain indices of strings having prefixes or ending at each node
         int prefix, isEnd;        // To count prefixes and strings ending at each node
         Node()
         {
             prefix = 0;
             isEnd = 0;
-            for (int i{}; i < 26; i++)
-                character[i] = nullptr;
         }
     };
 
@@ -73,18 +71,15 @@ struct Trie
                 return false;
             cur = cur->character[idx];
         }
-        // auto &st = cur->idxPref;
-        // return (st.lower_bound(L) != st.end() && *st.lower_bound(L) <= R);
-        return cur->prefix;
+        auto &st = cur->idxPref;
+        return (st.lower_bound(L) != st.end() && *st.lower_bound(L) <= R);
+        // return cur->prefix;
     }
 
     // Checks if a node is a leaf node (doesn't have any children)
     bool isLeaf(Node *root)
     {
-        for (int i = 0; i < 26; i++)
-            if (root->character[i])
-                return false;
-        return true;
+        return root->character.empty();
     }
 
     // Recursive function to delete a key from given Trie
@@ -98,82 +93,20 @@ struct Trie
             node->isEnd--;
             return;
         }
-        for (auto *&child : node->character)
+        for (auto &[character, node] : node->character)
         {
-            if (child != nullptr && child->idxPref.find(pos) != child->idxPref.end())
+            if (node != nullptr && node->idxPref.find(pos) != node->idxPref.end())
             {
-                erase(child, pos);
+                erase(node, pos);
                 return;
             }
         }
     }
     ~Trie()
     {
-        for (auto *&child : root->character)
-        {
-            if (child != nullptr)
-                delete (child);
-        }
+        for (auto &[character, node] : root->character)
+            delete (node);
         delete (root);
-    }
-};
-
-struct binaryTrie
-{
-    struct Node
-    {
-        Node *child[2];
-        int freq[2];
-        Node()
-        {
-            child[0] = child[1] = 0;
-            freq[0] = freq[1] = 0;
-        }
-    };
-    Node *root = new Node();
-
-    binaryTrie()
-    {
-        insert(0);
-    }
-    void insert(ll n)
-    {
-        Node *cur = root;
-        for (int i = 30; i >= 0; i--) // change 30 based on number of bits in maximum number
-        {
-            int idx = ((n >> i) & 1); // same as (n & (1 << i)), but this avoids any overflow
-            if (cur->child[idx] == 0)
-                cur->child[idx] = new Node();
-            cur->freq[idx]++;
-            cur = cur->child[idx];
-        }
-    }
-    void erase(ll n, int i, Node *cur)
-    {
-        if (i == -1)
-            return;
-        int idx = ((n >> i) & 1);
-        erase(n, i - 1, cur->child[idx]);
-        cur->freq[idx]--;
-        if (cur->freq[idx] == 0)
-        {
-            delete cur->child[idx];
-            cur->child[idx] = NULL;
-        }
-    }
-    ll maxXor(ll n)
-    {
-        Node *cur = root;
-        ll ret = 0;
-        for (int i = 30; i >= 0; i--) // change 30 based on number of bits in maximum number
-        {
-            ll idx = ((n >> i) & 1); // same as (n & (1 << i)), but this avoids any overflow
-            if (cur->child[idx ^ 1] != 0)
-                cur = cur->child[idx ^ 1], ret |= (1 << i);
-            else
-                cur = cur->child[idx];
-        }
-        return ret;
     }
 };
 

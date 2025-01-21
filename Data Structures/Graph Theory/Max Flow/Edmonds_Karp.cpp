@@ -4,59 +4,112 @@ using namespace std;
 #define endl "\n"
 #define INF LLONG_MAX
 
-vector<vector<ll>> capacity;
-vector<vector<ll>> adj;
-
-ll bfs(vector<ll> &parent, int src, int dest)
+class maxFlow
 {
-    fill(parent.begin(), parent.end(), -1);
-    parent[src] = -2;
-    queue<pair<ll, ll>> q;
-    q.push({src, INF});
-
-    while (!q.empty())
+public:
+    int N;
+    vector<vector<ll>> adj;
+    vector<vector<ll>> capacity;
+    vector<vector<ll>> paths;
+    vector<deque<ll>> flowEdges;
+    vector<bool> visited;
+    maxFlow(int _N)
     {
-        auto &[cur, flow] = q.front();
-        q.pop();
+        N = _N;
+        adj.assign(N + 1, vector<ll>());
+        flowEdges.assign(N + 1, deque<ll>());
+        visited.assign(N + 1, false);
+        capacity.assign(N + 1, vector<ll>(N + 1, 0));
+    }
 
-        for (auto &next : adj[cur])
+    void addEdge(ll u, ll v, ll cap)
+    {
+        adj[u].push_back(v);
+        adj[v].push_back(u); // Reverse edge for residual graph
+        // To handle multiple edges make it +=
+        // Capacity of 1 in the graph and residual graph means that it is Unweighted
+        capacity[u][v] += cap;
+        // capacity[v][u] = cap;// if the graph is Undirected
+    }
+
+    ll BFS(int source, int sink, vector<ll> &parents)
+    {
+        fill(parents.begin(), parents.end(), -1);
+        parents[source] = -2;
+        queue<pair<ll, ll>> que;
+        que.push({source, INF});
+
+        while (!que.empty())
         {
-            if (parent[next] == -1 && capacity[cur][next] > 0)
+            auto &[current, flow] = que.front();
+            que.pop();
+
+            for (const auto &next : adj[current])
             {
-                parent[next] = cur;
-                ll new_flow = min(flow, capacity[cur][next]);
-                if (next == dest)
-                    return new_flow; // If we reach the sink, return the flow
-                q.push({next, new_flow});
+                if (parents[next] == -1 && capacity[current][next] > 0)
+                {
+                    parents[next] = current;
+                    ll currentFlow = min(flow, capacity[current][next]);
+                    if (next == sink) // If we reach the sink, return the flow
+                        return currentFlow;
+                    que.push({next, currentFlow});
+                }
             }
         }
+        return 0; // No augmenting path found
     }
 
-    return 0; // No augmenting path found
-}
-
-// Edmonds-Karp implementation for Maximum Flow
-ll maxflow(int N, ll src, ll dest)
-{
-    ll flow = 0;
-    vector<ll> parent(N + 1);
-    ll new_flow;
-
-    while (new_flow = bfs(parent, src, dest))
+    ll Edmond_Karp(int source, int sink)
     {
-        flow += new_flow;
-        ll cur = dest;
-        while (cur != src)
+        ll flow = 0;
+
+        vector<ll> parents(N + 1);
+
+        ll augmentingFlow = 0;
+        while ((augmentingFlow = BFS(source, sink, parents)))
         {
-            ll prev = parent[cur];
-            capacity[prev][cur] -= new_flow;
-            capacity[cur][prev] += new_flow;
-            cur = prev;
+            flow += augmentingFlow;
+            ll current = sink;
+            while (current != source)
+            {
+                ll previous = parents[current];
+                capacity[previous][current] -= augmentingFlow;
+                capacity[current][previous] += augmentingFlow;
+                current = previous;
+            }
+        }
+        return flow;
+    }
+    void dfs(vector<ll> &path, int node, int sink)
+    {
+        path.push_back(node); // Add the current node to the path
+        if (node == sink)
+        {
+            paths.push_back(path);
+            return;
+        }
+        dfs(path, flowEdges[node].front(), sink);
+        flowEdges[node].pop_front();
+    }
+    void extractPaths(vector<array<ll, 2>> &orgEdges, int src, int sink)
+    {
+        for (const auto &[u, v] : orgEdges)
+            capacity[u][v]--;
+        for (int u = 1; u <= sink; u++)
+        {
+            for (int v = 1; v <= sink; v++)
+            {
+                if (capacity[u][v] < 0)
+                    flowEdges[u].push_back(v); // adding the edge
+            }
+        }
+        while (!flowEdges[src].empty())
+        {
+            vector<ll> path;
+            dfs(path, src, sink);
         }
     }
-
-    return flow;
-}
+};
 
 int main()
 {
@@ -67,23 +120,29 @@ int main()
     freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
     int t = 1;
-    ll N, M, Q;
+    ll N, M;
     // cin >> t;
     while (t--)
     {
         cin >> N >> M;
-        adj.assign(N + 1, vector<ll>());
-        capacity.assign(N + 1, vector<ll>(N + 1));
+        ll src = 1, sink = N;
+        maxFlow maxflow(sink + 1);
         while (M--)
         {
             ll u, v, w;
             cin >> u >> v >> w;
-            // Graph is directed
-            adj[u].push_back(v);
-            adj[v].push_back(u); // Reverse edge for residual graph
-            capacity[u][v] += w; // Handle multiple edges between the same nodes
+            // Graph is directed and weighted
+            maxflow.addEdge(u, v, w);
         }
-        cout << maxflow(N, 1, N);
+        cout << maxflow.Edmond_Karp(src, sink) << endl;
+        // maxflow.extractPaths(edges, src, sink);
+        // for (const auto &path : maxflow.paths)
+        // {
+        // 	cout << path.size() << endl;
+        // 	for (const auto &node : path)
+        // 		cout << node << " ";
+        // 	cout << endl;
+        // }
     }
     return 0;
 }
