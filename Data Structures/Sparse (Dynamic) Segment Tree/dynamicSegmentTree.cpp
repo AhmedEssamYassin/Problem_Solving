@@ -48,7 +48,7 @@ private:
         res = (leftNode + rightNode);
         return res;
     }
-    void update(int left, int right, Node *Current, int idx, const ll &newValue)
+    void update(ll left, ll right, Node *Current, ll idx, const ll &newValue)
     {
         // idx is not in range [left, right]
         if (left > idx || right < idx)
@@ -66,7 +66,7 @@ private:
         update(mid + 1, right, Current->RightChild, idx, newValue);
         Current->Value = merge(Current->LeftChild->Value, Current->RightChild->Value);
     }
-    ll query(int left, int right, Node *Current, int leftQuery, int rightQuery)
+    ll query(ll left, ll right, Node *Current, ll leftQuery, ll rightQuery)
     {
         // [left, right] doesn't intersect with [leftQuery, rightQuery]
         if (left > rightQuery || right < leftQuery)
@@ -88,11 +88,11 @@ public:
         root = new Node();
         N = 1e9 + 1;
     }
-    void update(int idx, const ll &val)
+    void update(ll idx, const ll &val)
     {
         update(1, N, root, idx, val);
     }
-    ll query(int left, int right)
+    ll query(ll left, ll right)
     {
         ll ans = query(1, N, root, left, right);
         return ans;

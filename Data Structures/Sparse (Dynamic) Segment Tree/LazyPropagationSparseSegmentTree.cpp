@@ -45,7 +45,7 @@ private:
     Node *lazyRoot;
     ll merge(const ll &leftNode, const ll &rightNode) { return leftNode + rightNode; }
 
-    void push(int left, int right, Node *segNode, Node *lazyNode)
+    void push(ll left, ll right, Node *segNode, Node *lazyNode)
     {
         // Propagate the value
         if (segNode == nullptr || lazyNode == nullptr || lazyNode->Value == -1)
@@ -70,7 +70,7 @@ private:
         // Reset the lazy value
         lazyNode->Value = -1;
     }
-    void update(int left, int right, Node *segNode, Node *lazyNode, int leftQuery, int rightQuery, const ll &val)
+    void update(ll left, ll right, Node *segNode, Node *lazyNode, ll leftQuery, ll rightQuery, const ll &val)
     {
         push(left, right, segNode, lazyNode);
         // If the range is invalid, return
@@ -94,7 +94,7 @@ private:
         // Merge the children values
         segNode->Value = merge(segNode->LeftChild->Value, segNode->RightChild->Value);
     }
-    ll query(int left, int right, Node *segNode, Node *lazyNode, int leftQuery, int rightQuery)
+    ll query(ll left, ll right, Node *segNode, Node *lazyNode, ll leftQuery, ll rightQuery)
     {
         // If the range is invalid, return a value that does NOT to affect other queries
         if (left > rightQuery || right < leftQuery)
@@ -120,11 +120,11 @@ public:
         lazyRoot = new Node(-1);
         N = 1e5 + 1;
     }
-    void update(int left, int right, const ll &val)
+    void update(ll left, ll right, const ll &val)
     {
         update(0, N, segRoot, lazyRoot, left, right, val);
     }
-    ll query(int left, int right)
+    ll query(ll left, ll right)
     {
         ll ans = query(0, N, segRoot, lazyRoot, left, right);
         return ans;

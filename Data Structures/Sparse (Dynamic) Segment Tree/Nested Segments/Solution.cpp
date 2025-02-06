@@ -81,23 +81,12 @@ private:
 		ll rightSegment = query(mid + 1, right, Current->RightChild, leftQuery, rightQuery);
 		return merge(leftSegment, rightSegment);
 	}
-	ll kthOne(ll left, ll right, Node *Current, ll k)
-	{
-		if (left == right)
-			return (Current != nullptr && Current->Value == 1 ? left : -1);
-		Current->createChildren();
-		ll sumR = Current->RightChild->Value;
-		if (sumR >= k)
-			return kthOne(mid + 1, right, Current->RightChild, k);
-		else
-			return kthOne(left, mid, Current->LeftChild, k - sumR);
-	}
 
 public:
 	dynamicSegmentTree()
 	{
 		root = new Node();
-		N = 2e9 + 1;
+		N = 2e9 + 2;
 	}
 	void update(ll idx, const ll &val)
 	{
@@ -106,11 +95,6 @@ public:
 	ll query(ll left, ll right)
 	{
 		ll ans = query(0, N, root, left, right);
-		return ans;
-	}
-	ll kthOne(ll k)
-	{
-		ll ans = kthOne(0, N, root, k);
 		return ans;
 	}
 #undef mid
@@ -125,66 +109,45 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
 	int t = 1;
-	ll N, Q;
+	ll N;
 	// cin >> t;
 	while (t--)
 	{
-		cin >> N >> Q;
-		vector<ll> vc(N);
-		ll cnt[10]{};
-		auto addDigits = [&](ll N)
-		{
-			while (N)
-				cnt[N % 10]++, N /= 10;
-		};
-		auto removeDigits = [&](ll N)
-		{
-			while (N)
-				cnt[N % 10]--, N /= 10;
-		};
+		cin >> N;
+		vector<tuple<ll, ll, int>> intervals(N);
+		vector<ll> Rs;
 		dynamicSegmentTree segTree;
-		for (auto &x : vc)
-			cin >> x, addDigits(x), segTree.update(x, 1);
-		while (Q--)
+
+		// Instead of Coordinate compression
+		ll minValue = LLONG_MAX;
+		auto giveOffset = [&](ll x)
 		{
-			char type;
-			ll k;
-			cin >> type >> k;
-			if (type == '+')
-			{
-				if (segTree.query(k, k))
-				{
-					removeDigits(k);
-					segTree.update(k, -1);
-				}
-				else
-				{
-					addDigits(k);
-					segTree.update(k, +1);
-				}
-			}
-			else if (type == '-')
-			{
-				ll pos = segTree.kthOne(k);
-				if (~pos)
-				{
-					removeDigits(pos);
-					segTree.update(pos, -1);
-				}
-			}
-			else // '?'
-			{
-				if (segTree.query(k, k))
-				{
-					ll ans{};
-					while (k)
-						ans += cnt[k % 10], k /= 10;
-					cout << ans << endl;
-				}
-				else
-					cout << -1 << endl;
-			}
+			return x + abs(minValue);
+		};
+		int pos = 0;
+		for (auto &[L, R, idx] : intervals)
+		{
+			cin >> L >> R;
+			idx = pos++;
+			minValue = min(minValue, L);
+			minValue = min(minValue, R);
 		}
+
+		for (auto &[L, R, idx] : intervals)
+		{
+			L = giveOffset(L);
+			R = giveOffset(R);
+		}
+		map<ll, ll> ans;
+		sort(intervals.begin(), intervals.end()); // Sorting on basis of `L`
+		for (int i = N - 1; i >= 0; i--)
+		{
+			auto &[L, R, idx] = intervals[i];
+			ans[idx] = segTree.query(0, R);
+			segTree.update(R, 1);
+		}
+		for (const auto &[idx, cnt] : ans)
+			cout << cnt << endl;
 	}
 	return 0;
 }
