@@ -2,6 +2,7 @@
 using namespace std;
 #define ll long long int
 #define endl "\n"
+#define INF LLONG_MAX
 
 // https://codeforces.com/contest/843/problem/D
 
@@ -9,7 +10,7 @@ struct Edge
 {
     ll node = -1;
     ll par = -1; // parent
-    ll cost = LLONG_MAX;
+    ll cost = INF;
     Edge(ll node, ll weight, ll par = -1) : node(node), cost(weight), par(par) {}
     bool operator<(const Edge &E) const
     {
@@ -20,7 +21,7 @@ struct Edge
 bitset<100001> inQueue;
 void SPFA(const vector<vector<Edge>> &graph, vector<ll> &dis, int N, int src)
 {
-    dis.assign(N + 1, LLONG_MAX);
+    dis.assign(N + 1, INF);
     inQueue.reset();
     deque<ll> q;
     q.push_back(src);
@@ -40,7 +41,7 @@ void SPFA(const vector<vector<Edge>> &graph, vector<ll> &dis, int N, int src)
             q.pop_front();
         }
         inQueue[u] = false;
-        for (const auto &[v, w, p] : graph[u])
+        for (const auto &[v, p, w] : graph[u])
         {
             if (dis[v] > dis[u] + w)
             {
@@ -93,7 +94,7 @@ int main()
                 cin >> v;
                 if (pending)
                     SPFA(graph, dis, N, 1), pending = false;
-                if (dis[v] == LLONG_MAX)
+                if (dis[v] == INF)
                     cout << -1 << endl;
                 else
                     cout << dis[v] << endl;

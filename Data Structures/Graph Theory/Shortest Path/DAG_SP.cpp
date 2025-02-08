@@ -7,7 +7,7 @@ struct Edge
 {
     ll node = -1;
     ll par = -1; // parent
-    ll cost = LLONG_MAX;
+    ll cost = INT_MAX;
     Edge(ll node, ll weight, ll par = -1) : node(node), cost(weight), par(par) {}
     bool operator<(const Edge &E) const
     {

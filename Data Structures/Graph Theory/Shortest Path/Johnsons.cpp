@@ -15,36 +15,26 @@ vector<ll> Bellman_Ford(vector<Edge> &edges, int N, int src)
 {
     vector<ll> dist(N + 1, INF);
     dist[src] = 0;
-    ll lastNode = -1;
     // Relax all edges N times
     for (int i = 0; i <= N; i++)
     {
-        lastNode = -1;
         for (auto &[u, v, w] : edges)
         {
             if (dist[u] != INF && dist[u] + w < dist[v])
             {
                 dist[v] = dist[u] + w;
-                lastNode = v;
+                // Check for negative weight cycles
+                if (i == N)
+                    return {};
             }
         }
     }
-
-    // Check for negative weight cycles
-    // for (const auto &[u, v, w] : edges)
-    // {
-    // 	if (dist[u] < INF && dist[u] + w < dist[v])
-    // 		return {}; // Negative cycle detected
-    // }
-    if (lastNode != -1)
-        return {};
 
     return dist;
 }
 
 void Dijkstra(vector<vector<pair<ll, ll>>> &graph, vector<ll> &dist, int N, int src)
 {
-    dist.assign(N + 1, INF);
     priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> prQue;
 
     dist[src] = 0;
@@ -58,13 +48,11 @@ void Dijkstra(vector<vector<pair<ll, ll>>> &graph, vector<ll> &dist, int N, int 
         if (currentDist > dist[u])
             continue;
 
+        dist[u] = currentDist;
         for (const auto &[v, w] : graph[u])
         {
             if (dist[u] + w < dist[v])
-            {
-                dist[v] = dist[u] + w;
-                prQue.emplace(dist[v], v);
-            }
+                prQue.emplace(dist[u] + w, v);
         }
     }
 }
@@ -127,6 +115,8 @@ int main()
             edges.emplace_back(u, v, w);
             edges.emplace_back(v, u, w);
         }
+        // Faster for sparse graphs (than Floyd-Warshall)
+        // A graph is sparse when |E| <= |V| log |V|
         Johnson(edges, N);
         while (Q--)
         {

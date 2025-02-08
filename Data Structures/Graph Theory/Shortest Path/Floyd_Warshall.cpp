@@ -2,12 +2,13 @@
 using namespace std;
 #define ll long long int
 #define endl "\n"
+#define INF LLONG_MAX
 
 struct Edge
 {
     ll node = -1;
     ll par = -1; // parent
-    ll cost = LLONG_MAX;
+    ll cost = INF;
     Edge(ll node, ll weight, ll par = -1) : node(node), cost(weight), par(par) {}
     bool operator<(const Edge &E) const
     {
@@ -15,7 +16,6 @@ struct Edge
     }
 };
 
-#define INF LLONG_MAX
 vector<vector<ll>> dist;
 void DetectNegativeCycles(int N)
 {
@@ -84,7 +84,8 @@ int main()
             // If the Graph is Undirected
             graph[v].push_back({u, w});
         }
-
+        // Faster than Johnson's algorithm for Dense graphs
+        // A graph is dense if |E| <= |V|²
         Floyd_Warshall(graph, N); // O(N³)
         while (Q--)
         {

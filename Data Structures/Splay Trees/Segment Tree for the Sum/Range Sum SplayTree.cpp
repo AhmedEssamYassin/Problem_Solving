@@ -363,18 +363,18 @@ public:
 		}
 		return result;
 	}
-	void swapRange(SplayTree *&spTree, ll a, ll b, ll len)
+	void swapRange(SplayTree *&spTree, ll i, ll j, ll k, ll l)
 	{
-		// First split into three parts: [1, a - 1], [a, a + len - 1], rest
-		auto [leftPart, middle1] = SplayTree::split(spTree, a - 1);
-		auto [firstRange, rightPart1] = SplayTree::split(middle1, len);
+		// First split into three parts: [1, i - 1], [i, j], rest
+		auto [leftPart, middle1] = SplayTree::split(spTree, i - 1);
+		auto [firstRange, rightPart1] = SplayTree::split(middle1, j - i + 1);
 
-		// From the right part, split into: [a + len, b - 1], [b, b + len - 1], rest
-		auto [middle2, rightPart2] = SplayTree::split(rightPart1, b - (a + len));
-		auto [secondRange, lastPart] = SplayTree::split(rightPart2, len);
+		// From the right part, split into: [j + 1, k - 1], [k, l], rest
+		auto [middle2, rightPart2] = SplayTree::split(rightPart1, k - (j + 1));
+		auto [secondRange, lastPart] = SplayTree::split(rightPart2, l - k + 1);
 
 		// Now merge in the new order:
-		// [1, a - 1] + [b, b + len - 1] + [a + len, b - 1] + [a, a + len - 1] + rest
+		// [1, i - 1] + [k, l] + [j + 1, k - 1] + [i, j] + rest
 		spTree = SplayTree::merge(
 			leftPart,
 			SplayTree::merge(
@@ -386,25 +386,25 @@ public:
 						lastPart))));
 	}
 	// Helper function to free memory of deleted nodes
-	void freeNodes(SplayTree *t)
+	void freeNodes(SplayTree *treeNode)
 	{
-		if (!t)
+		if (!treeNode)
 			return;
-		t->push(); // Ensure lazy propagation is handled
-		freeNodes(t->left);
-		freeNodes(t->right);
-		if (t)
-			delete t;
+		treeNode->push(); // Ensure lazy propagation is handled
+		freeNodes(treeNode->left);
+		freeNodes(treeNode->right);
+		if (treeNode)
+			delete treeNode;
 	}
-	static void output(SplayTree *t)
+	static void output(SplayTree *treeNode)
 	{
-		if (t == nullptr)
+		if (treeNode == nullptr)
 			return;
-		t->push();
+		treeNode->push();
 		// Inorder traversal
-		output(t->left);
-		cout << t->value << " ";
-		output(t->right);
+		output(treeNode->left);
+		cout << treeNode->value << " ";
+		output(treeNode->right);
 	}
 };
 

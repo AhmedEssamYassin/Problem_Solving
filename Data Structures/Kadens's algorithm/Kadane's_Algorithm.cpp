@@ -1,7 +1,3 @@
-#ifdef ONLINE_JUDGE
-#pragma GCC optimize("Ofast,unroll-loops")
-#pragma GCC target("avx,avx2,popcnt")
-#endif
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long int

@@ -44,7 +44,7 @@ ll modPow(ll N, ll power, ll mod)
     }
     return res;
 }
-ll b1 = rng(100, 1000000000), b2 = rng(1000, 1000000000);
+ll b1 = rng(100, 1000000000), b2 = rng(b1 + 10, 1000000000);
 ll b1I = modPow(b1, mod - 2, mod), b2I = modPow(b2, mod - 2, mod);
 vector<ll> Pb1, Pb2, sumB1, sumB2;
 void pre(ll maxSize)
@@ -165,7 +165,9 @@ struct HashRange
     {
         if (t.empty())
             return;
-        for (int i = 0; i < t.size(); i++)
+        if (p.empty())
+            p.push_back(t[0]);
+        for (int i = 1; i < t.size(); i++)
             p.push_back(p.back() + t[i]);
     }
 };
