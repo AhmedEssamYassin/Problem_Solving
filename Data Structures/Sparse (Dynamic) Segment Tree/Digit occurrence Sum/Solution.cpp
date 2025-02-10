@@ -42,11 +42,9 @@ private:
 	};
 	ll N;
 	Node *root;
-	ll merge(const ll &leftNode, const ll &rightNode)
+	void merge(Node *&segNode)
 	{
-		ll res;
-		res = (leftNode + rightNode);
-		return res;
+		segNode->Value = segNode->LeftChild->Value + segNode->RightChild->Value;
 	}
 	void update(ll left, ll right, Node *Current, ll idx, const ll &newValue)
 	{
@@ -64,7 +62,7 @@ private:
 		Current->createChildren();
 		update(left, mid, Current->LeftChild, idx, newValue);
 		update(mid + 1, right, Current->RightChild, idx, newValue);
-		Current->Value = merge(Current->LeftChild->Value, Current->RightChild->Value);
+		merge(Current);
 	}
 	ll query(ll left, ll right, Node *Current, ll leftQuery, ll rightQuery)
 	{
@@ -79,7 +77,7 @@ private:
 		Current->createChildren();
 		ll leftSegment = query(left, mid, Current->LeftChild, leftQuery, rightQuery);
 		ll rightSegment = query(mid + 1, right, Current->RightChild, leftQuery, rightQuery);
-		return merge(leftSegment, rightSegment);
+		return (leftSegment + rightSegment);
 	}
 	ll kthOne(ll left, ll right, Node *Current, ll k)
 	{
@@ -94,10 +92,10 @@ private:
 	}
 
 public:
-	dynamicSegmentTree()
+	dynamicSegmentTree(ll rangeSize = 2e9)
 	{
 		root = new Node();
-		N = 2e9 + 1;
+		N = rangeSize + 1;
 	}
 	void update(ll idx, const ll &val)
 	{

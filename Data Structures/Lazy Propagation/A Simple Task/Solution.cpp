@@ -15,9 +15,15 @@ private:
 		Node() {}
 		Node(const ll &N) : value(N) {}
 	};
+	struct LazyNode
+	{
+		ll value;
+		LazyNode() {}
+		LazyNode(const ll &N) : value(N) {}
+	};
 	int size;
 	vector<Node> seg;
-	vector<Node> lazy;
+	vector<LazyNode> lazy;
 	Node merge(const Node &leftNode, const Node &rightNode)
 	{
 		Node res = (leftNode.value + rightNode.value);
@@ -32,6 +38,7 @@ private:
 				seg[node] = arr[left];
 			return;
 		}
+
 		// Recursively build the left child
 		build(left, mid, L, arr);
 		// Recursively build the right child
@@ -101,7 +108,7 @@ public:
 		while (size < n)
 			size <<= 1;
 		seg = vector<Node>(2 * size, 0);
-		lazy = vector<Node>(2 * size, -1);
+		lazy = vector<LazyNode>(2 * size, -1);
 		build(0, size - 1, 0, arr);
 	}
 	void update(int left, int right, const ll &val)

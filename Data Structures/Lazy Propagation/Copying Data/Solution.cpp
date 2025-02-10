@@ -15,11 +15,11 @@ private:
 		Node() {}
 		Node(const ll &N) : value(N) {}
 	};
-	struct AP
+	struct LazyNode
 	{
 		ll cnt, inc;
-		AP() {}
-		AP(ll b, ll c) : cnt(b), inc(c) {}
+		LazyNode() {}
+		LazyNode(ll b, ll c) : cnt(b), inc(c) {}
 	};
 	ll sum(const ll &N)
 	{
@@ -27,7 +27,7 @@ private:
 	}
 	int size;
 	vector<Node> seg;
-	vector<AP> lazy;
+	vector<LazyNode> lazy;
 	Node merge(const Node &leftNode, const Node &rightNode)
 	{
 		Node res = (leftNode.value + rightNode.value);
@@ -68,7 +68,7 @@ private:
 			lazy[R].inc = lazy[node].inc;
 		}
 		// Reset the lazy value
-		lazy[node] = AP(-1, -1);
+		lazy[node] = LazyNode(-1, -1);
 	}
 	void update(int left, int right, int node, int leftQuery, int rightQuery, const ll &a, const ll &d)
 	{
@@ -115,7 +115,7 @@ public:
 		while (size < n)
 			size <<= 1;
 		seg = vector<Node>(2 * size, -1);
-		lazy = vector<AP>(2 * size, AP(-1, -1));
+		lazy = vector<LazyNode>(2 * size, LazyNode(-1, -1));
 		// build(0, size - 1, 0, arr);
 	}
 	void update(int left, int right, const ll &a, const ll &d)

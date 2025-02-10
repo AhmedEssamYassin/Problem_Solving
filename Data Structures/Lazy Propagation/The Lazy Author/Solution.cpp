@@ -14,7 +14,13 @@ private:
 		ll value;
 		Node() {}
 		Node(const ll &N) : value(N) {}
-		Node operator^(const Node &RHS)
+	};
+	struct LazyNode
+	{
+		ll value;
+		LazyNode() {}
+		LazyNode(const ll &N) : value(N) {}
+		LazyNode operator^(const LazyNode &RHS)
 		{
 			value ^= RHS.value;
 			return *this;
@@ -22,7 +28,7 @@ private:
 	};
 	int size;
 	vector<Node> seg;
-	vector<Node> lazy;
+	vector<LazyNode> lazy;
 	Node merge(const Node &leftNode, const Node &rightNode)
 	{
 		Node res = (leftNode.value + rightNode.value);
@@ -106,7 +112,7 @@ public:
 		while (size < n)
 			size <<= 1;
 		seg = vector<Node>(2 * size, 0);
-		lazy = vector<Node>(2 * size, 0);
+		lazy = vector<LazyNode>(2 * size, 0);
 		build(0, size - 1, 0, arr);
 	}
 	void update(int left, int right, const ll &val)

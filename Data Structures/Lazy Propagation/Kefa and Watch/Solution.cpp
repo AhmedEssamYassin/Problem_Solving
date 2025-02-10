@@ -169,7 +169,6 @@ private:
 	struct Node
 	{
 		Hash v;
-		ll edit = -1;
 		Node() {}
 		Node(const ll &N)
 		{
@@ -177,8 +176,15 @@ private:
 				v = v + N;
 		}
 	};
+	struct LazyNode
+	{
+		ll value = -1;
+		LazyNode() {}
+		LazyNode(const ll &N) : value(N) {}
+	};
 	int size;
 	vector<Node> seg;
+	vector<LazyNode> lazy;
 	Node merge(Node &leftNode, const Node &rightNode)
 	{
 		Node res;
@@ -192,33 +198,31 @@ private:
 		{
 			if (left < str.size())
 				seg[node] = str[left];
+			return;
 		}
-		else
-		{
-			// Recursively build the left child
-			build(left, mid, L, str);
-			// Recursively build the right child
-			build(mid + 1, right, R, str);
-			// Merge the children values
-			seg[node] = merge(seg[L], seg[R]);
-		}
+		// Recursively build the left child
+		build(left, mid, L, str);
+		// Recursively build the right child
+		build(mid + 1, right, R, str);
+		// Merge the children values
+		seg[node] = merge(seg[L], seg[R]);
 	}
 	void push(int left, int right, int node)
 	{
 		// Propagate the value
-		if (seg[node].edit != -1)
+		if (lazy[node].value != -1)
 		{
-			seg[node].v.code = {sumB1[right - left] * seg[node].edit % mod, sumB2[right - left] * seg[node].edit % mod};
+			seg[node].v.code = {sumB1[right - left] * lazy[node].value % mod, sumB2[right - left] * lazy[node].value % mod};
 			// If the node is not a leaf
 			if (left != right)
 			{
 				// Update the lazy values for the left child
-				seg[L].edit = seg[node].edit;
+				lazy[L] = lazy[node];
 				// Update the lazy values for the right child
-				seg[R].edit = seg[node].edit;
+				lazy[R] = lazy[node];
 			}
 			// Reset the lazy value
-			seg[node].edit = -1;
+			lazy[node].value = -1;
 		}
 	}
 	void update(int left, int right, int node, int leftQuery, int rightQuery, const ll &val)
@@ -231,20 +235,18 @@ private:
 		if (left >= leftQuery && right <= rightQuery)
 		{
 			// Update the lazy value
-			seg[node].edit = val;
+			lazy[node].value = val;
 
 			// Apply the update immediately
 			push(left, right, node);
+			return;
 		}
-		else
-		{
-			// Recursively update the left child
-			update(left, mid, L, leftQuery, rightQuery, val);
-			// Recursively update the right child
-			update(mid + 1, right, R, leftQuery, rightQuery, val);
-			// Merge the children values
-			seg[node] = merge(seg[L], seg[R]);
-		}
+		// Recursively update the left child
+		update(left, mid, L, leftQuery, rightQuery, val);
+		// Recursively update the right child
+		update(mid + 1, right, R, leftQuery, rightQuery, val);
+		// Merge the children values
+		seg[node] = merge(seg[L], seg[R]);
 	}
 	Node query(int left, int right, int node, int leftQuery, int rightQuery)
 	{
@@ -270,6 +272,7 @@ public:
 		while (size < n)
 			size <<= 1;
 		seg = vector<Node>(2 * size, 0);
+		lazy = vector<LazyNode>(2 * size, -1);
 		build(0, size - 1, 0, str);
 	}
 	void update(int left, int right, const ll &val)

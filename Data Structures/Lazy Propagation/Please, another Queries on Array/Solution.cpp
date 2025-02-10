@@ -95,6 +95,7 @@ private:
 			return *this;
 		}
 	};
+	// LazyNode is identical to the Node of segment tree
 	int size;
 	vector<Node> seg, lazy;
 	Node merge(const Node &leftNode, const Node &rightNode)
@@ -113,20 +114,20 @@ private:
 		{
 			if (left < arr.size())
 				seg[node] = arr[left];
+			return;
 		}
-		else
-		{
-			// Recursively build the left child
-			build(left, mid, L, arr);
-			// Recursively build the right child
-			build(mid + 1, right, R, arr);
+		// Recursively build the left child
+		build(left, mid, L, arr);
+		// Recursively build the right child
+		build(mid + 1, right, R, arr);
 
-			// Merge the children values
-			seg[node] = merge(seg[L], seg[R]);
-		}
+		// Merge the children values
+		seg[node] = merge(seg[L], seg[R]);
 	}
 	void push(int left, int right, int node)
 	{
+		if (lazy[node].value == 1)
+			return;
 		// Propagate the value
 		ll val = modBinExp(lazy[node].value, right - left + 1, mod);
 		seg[node].value = (seg[node].value * val) % mod;
@@ -156,16 +157,14 @@ private:
 
 			// Apply the update immediately
 			push(left, right, node);
+			return;
 		}
-		else
-		{
-			// Recursively update the left child
-			update(left, mid, L, leftQuery, rightQuery, val);
-			// Recursively update the right child
-			update(mid + 1, right, R, leftQuery, rightQuery, val);
-			// Merge the children values
-			seg[node] = merge(seg[L], seg[R]);
-		}
+		// Recursively update the left child
+		update(left, mid, L, leftQuery, rightQuery, val);
+		// Recursively update the right child
+		update(mid + 1, right, R, leftQuery, rightQuery, val);
+		// Merge the children values
+		seg[node] = merge(seg[L], seg[R]);
 	}
 	Node query(int left, int right, int node, int leftQuery, int rightQuery)
 	{

@@ -36,16 +36,14 @@ private:
 		{
 			if (left < arr.size())
 				seg[node] = arr[left];
+			return;
 		}
-		else
-		{
-			// Recursively build the left child
-			build(left, mid, L, arr);
-			// Recursively build the right child
-			build(mid + 1, right, R, arr);
-			// Merge the children values
-			seg[node] = merge(seg[L], seg[R]);
-		}
+		// Recursively build the left child
+		build(left, mid, L, arr);
+		// Recursively build the right child
+		build(mid + 1, right, R, arr);
+		// Merge the children values
+		seg[node] = merge(seg[L], seg[R]);
 	}
 	void rangeUpdate(int left, int right, int node, int leftQuery, int rightQuery, const ll &val)
 	{
@@ -117,12 +115,6 @@ public:
 	{
 		Node ans = query(0, size - 1, 0, left, right);
 		return ans;
-	}
-	void print()
-	{
-		for (int i = 7; i < 15; i++)
-			cout << seg[i].value << " ";
-		cout << endl;
 	}
 
 #undef L

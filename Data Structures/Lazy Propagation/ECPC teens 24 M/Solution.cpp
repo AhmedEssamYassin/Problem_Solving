@@ -16,14 +16,26 @@ private:
 		Node() {}
 		Node(const ll &N) : sum(N), GCD(N) {}
 	};
+	struct LazyNode
+	{
+		ll mult;
+		ll div;
+		LazyNode(const ll &m = 1, const ll &d = 1) : mult(m), div(d) {}
+		LazyNode operator*(const LazyNode &RHS)
+		{
+			mult *= RHS.mult;
+			div *= RHS.div;
+			return *this;
+		}
+	};
 	int size;
-	vector<ll> mult, div;
 	vector<Node> seg;
+	vector<LazyNode> lazy;
 	void reduce(ll node)
 	{
-		ll g = gcd(mult[node], div[node]);
-		mult[node] /= g;
-		div[node] /= g;
+		ll g = gcd(lazy[node].mult, lazy[node].div);
+		lazy[node].mult /= g;
+		lazy[node].div /= g;
 	}
 	Node merge(const Node &leftNode, const Node &rightNode)
 	{
@@ -39,40 +51,35 @@ private:
 		{
 			if (left < arr.size())
 				seg[node] = arr[left];
+			return;
 		}
-		else
-		{
-			// Recursively build the left child
-			build(left, mid, L, arr);
-			// Recursively build the right child
-			build(mid + 1, right, R, arr);
-			// Merge the children values
-			seg[node] = merge(seg[L], seg[R]);
-		}
+		// Recursively build the left child
+		build(left, mid, L, arr);
+		// Recursively build the right child
+		build(mid + 1, right, R, arr);
+		// Merge the children values
+		seg[node] = merge(seg[L], seg[R]);
 	}
 	void push(int left, int right, int node)
 	{
-		if (mult[node] == 1 && div[node] == 1)
+		if (lazy[node].mult == 1 && lazy[node].div == 1)
 			return;
 		// Propagate the value
 		reduce(node);
-		seg[node].sum = (seg[node].sum * mult[node] / div[node]);
-		seg[node].GCD = (seg[node].GCD * mult[node] / div[node]);
+		seg[node].sum = (seg[node].sum * lazy[node].mult / lazy[node].div);
+		seg[node].GCD = (seg[node].GCD * lazy[node].mult / lazy[node].div);
 		// If the node is not a leaf
 		if (left != right)
 		{
 			// Update the lazy values for the left child
-			mult[L] *= mult[node];
-			div[L] *= div[node];
+			lazy[L] = lazy[L] * lazy[node];
 			// Update the lazy values for the right child
-			mult[R] *= mult[node];
-			div[R] *= div[node];
+			lazy[R] = lazy[R] * lazy[node];
 			reduce(L);
 			reduce(R);
 		}
 		// Reset the mult,div value
-		mult[node] = 1;
-		div[node] = 1;
+		lazy[node] = 1;
 	}
 
 	void update(int left, int right, int node, int leftQuery, int rightQuery, const ll &val)
@@ -85,20 +92,18 @@ private:
 		if (left >= leftQuery && right <= rightQuery)
 		{
 			// Update the lazy value
-			div[node] *= val;
+			lazy[node] = {1, val};
 
 			// Apply the update immediately
 			push(left, right, node);
+			return;
 		}
-		else
-		{
-			// Recursively update the left child
-			update(left, mid, L, leftQuery, rightQuery, val);
-			// Recursively update the right child
-			update(mid + 1, right, R, leftQuery, rightQuery, val);
-			// Merge the children values
-			seg[node] = merge(seg[L], seg[R]);
-		}
+		// Recursively update the left child
+		update(left, mid, L, leftQuery, rightQuery, val);
+		// Recursively update the right child
+		update(mid + 1, right, R, leftQuery, rightQuery, val);
+		// Merge the children values
+		seg[node] = merge(seg[L], seg[R]);
 	}
 
 	void undoUpdate(int left, int right, int node, int leftQuery, int rightQuery, const ll &val)
@@ -111,20 +116,18 @@ private:
 		if (left >= leftQuery && right <= rightQuery)
 		{
 			// Update the lazy value
-			mult[node] *= val;
+			lazy[node] = {val, 1};
 
 			// Apply the update immediately
 			push(left, right, node);
+			return;
 		}
-		else
-		{
-			// Recursively update the left child
-			undoUpdate(left, mid, L, leftQuery, rightQuery, val);
-			// Recursively update the right child
-			undoUpdate(mid + 1, right, R, leftQuery, rightQuery, val);
-			// Merge the children values
-			seg[node] = merge(seg[L], seg[R]);
-		}
+		// Recursively update the left child
+		undoUpdate(left, mid, L, leftQuery, rightQuery, val);
+		// Recursively update the right child
+		undoUpdate(mid + 1, right, R, leftQuery, rightQuery, val);
+		// Merge the children values
+		seg[node] = merge(seg[L], seg[R]);
 	}
 
 	Node query(int left, int right, int node, int leftQuery, int rightQuery)
@@ -152,8 +155,7 @@ public:
 		while (size < n)
 			size <<= 1;
 		seg = vector<Node>(2 * size, 0);
-		mult = vector<ll>(2 * size, 1);
-		div = vector<ll>(2 * size, 1);
+		lazy = vector<LazyNode>(2 * size, 1);
 		build(0, size - 1, 0, arr);
 	}
 	void update(int left, int right, const ll &val, int type)

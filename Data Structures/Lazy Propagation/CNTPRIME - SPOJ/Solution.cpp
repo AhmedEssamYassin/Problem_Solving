@@ -32,9 +32,15 @@ private:
 		Node() {}
 		Node(const ll &N) : CNTPRIME(isPrime[N]) {}
 	};
+	struct LazyNode
+	{
+		ll value{};
+		LazyNode() {}
+		LazyNode(const ll &N) : value(N) {}
+	};
 	int size;
 	vector<Node> seg;
-	vector<ll> lazy;
+	vector<LazyNode> lazy;
 	Node merge(const Node &leftNode, const Node &rightNode)
 	{
 		Node res;
@@ -50,24 +56,22 @@ private:
 		{
 			if (left < arr.size())
 				seg[node] = arr[left];
+			return;
 		}
-		else
-		{
-			// Recursively build the left child
-			build(left, mid, L, arr);
-			// Recursively build the right child
-			build(mid + 1, right, R, arr);
+		// Recursively build the left child
+		build(left, mid, L, arr);
+		// Recursively build the right child
+		build(mid + 1, right, R, arr);
 
-			// Merge the children values
-			seg[node] = merge(seg[L], seg[R]);
-		}
+		// Merge the children values
+		seg[node] = merge(seg[L], seg[R]);
 	}
 	void push(int left, int right, int node)
 	{
 		// Propagate the value
-		if (lazy[node])
+		if (lazy[node].value != 0)
 		{
-			seg[node].CNTPRIME = (right - left + 1) * isPrime[lazy[node]];
+			seg[node].CNTPRIME = (right - left + 1) * isPrime[lazy[node].value];
 			// If the node is not a leaf
 			if (left != right)
 			{
@@ -94,16 +98,14 @@ private:
 
 			// Apply the update immediately
 			push(left, right, node);
+			return;
 		}
-		else
-		{
-			// Recursively update the left child
-			update(left, mid, L, leftQuery, rightQuery, val);
-			// Recursively update the right child
-			update(mid + 1, right, R, leftQuery, rightQuery, val);
-			// Merge the children values
-			seg[node] = merge(seg[L], seg[R]);
-		}
+		// Recursively update the left child
+		update(left, mid, L, leftQuery, rightQuery, val);
+		// Recursively update the right child
+		update(mid + 1, right, R, leftQuery, rightQuery, val);
+		// Merge the children values
+		seg[node] = merge(seg[L], seg[R]);
 	}
 	Node query(int left, int right, int node, int leftQuery, int rightQuery)
 	{
@@ -129,7 +131,7 @@ public:
 			size <<= 1;
 
 		seg = vector<Node>(2 * size, 0);
-		lazy = vector<ll>(2 * size, 0);
+		lazy = vector<LazyNode>(2 * size, 0);
 		build(0, size - 1, 0, arr);
 	}
 	void update(int left, int right, const ll &val)

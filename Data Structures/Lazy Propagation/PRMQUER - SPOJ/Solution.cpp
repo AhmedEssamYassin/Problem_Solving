@@ -29,26 +29,31 @@ struct segmentTree
 private:
 	struct Node
 	{
+		ll countPrimes{};
 		ll value{};
-		ll number{};
 		Node() {}
 		Node(const ll &N)
 		{
 			if (N <= 10000000 && N >= 0)
-				value = isPrime[N];
+				countPrimes = isPrime[N];
 			else
-				value = 0;
-			number = N;
+				countPrimes = 0;
+			value = N;
 		}
+	};
+	struct LazyNode
+	{
+		ll value{};
+		LazyNode() {}
+		LazyNode(const ll &N) : value(N) {}
 	};
 	int size;
 	vector<Node> seg;
-	vector<Node> lazy;
+	vector<LazyNode> lazy;
 	Node merge(const Node &leftNode, const Node &rightNode)
 	{
 		Node res;
-		res.value = (leftNode.value + rightNode.value);
-		res.number = (leftNode.number + rightNode.number);
+		res.countPrimes = (leftNode.countPrimes + rightNode.countPrimes);
 		return res;
 	}
 	void build(int left, int right, int node, const vector<ll> &arr)
@@ -70,21 +75,21 @@ private:
 	void push(int left, int right, int node)
 	{
 		// Propagate the value
-		if (lazy[node].number == -1)
+		if (lazy[node].value == -1)
 			return;
 
-		if (lazy[node].number <= 10000000)
-			seg[node].value = (right - left + 1) * isPrime[lazy[node].number];
+		if (lazy[node].value <= 10000000)
+			seg[node].countPrimes = (right - left + 1) * isPrime[lazy[node].value];
 		else
-			seg[node].value = 0;
-		seg[node].number = (right - left + 1) * lazy[node].number;
+			seg[node].countPrimes = 0;
+		seg[node].value = (right - left + 1) * lazy[node].value;
 		// If the node is not a leaf
 		if (left != right)
 		{
 			// Update the lazy values for the left child
-			lazy[L] = lazy[node].number;
+			lazy[L] = lazy[node];
 			// Update the lazy values for the right child
-			lazy[R] = lazy[node].number;
+			lazy[R] = lazy[node];
 		}
 		// Reset the lazy value
 		lazy[node] = -1;
@@ -120,11 +125,11 @@ private:
 		if (left == right)
 		{
 			// Update the lazy value
-			seg[node].number += val;
-			if (seg[node].number <= 10000000)
-				seg[node].value = isPrime[seg[node].number];
+			seg[node].value += val;
+			if (seg[node].value <= 10000000)
+				seg[node].countPrimes = isPrime[seg[node].value];
 			else
-				seg[node].value = 0;
+				seg[node].countPrimes = 0;
 			return;
 		}
 		// Recursively update the left child
@@ -157,7 +162,7 @@ public:
 		while (size < n)
 			size <<= 1;
 		seg = vector<Node>(2 * size, 0);
-		lazy = vector<Node>(2 * size, -1);
+		lazy = vector<LazyNode>(2 * size, -1);
 		build(0, size - 1, 0, arr);
 	}
 	void updateRange(int left, int right, const ll &val)
@@ -171,7 +176,7 @@ public:
 	ll query(int left, int right)
 	{
 		Node ans = query(0, size - 1, 0, left, right);
-		return ans.value;
+		return ans.countPrimes;
 	}
 
 #undef L
