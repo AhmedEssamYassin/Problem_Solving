@@ -3,19 +3,6 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-/*
-Parent Node : A node with NO parent
-Leaf Node: A node with NO children
-Siblings: Nodes that are of the same level in the heirarchy
-
-At level of Leafs, each node is responsible for one node (single element) (0 trailing zeros)
-in its higher level, each node is responsible for 2 nodes (1 trailing zero)
-in its higher level, each node is responsible for 4 nodes (2 trailing zeros)
-in its higher level, each node is responsible for 8 nodes (3 trailing zeros)
-and so on
-
-So we can alternate between levels based on the parity of number of trailing zeros.
-*/
 struct segmentTree
 {
 #define L (2 * node + 1)
@@ -25,23 +12,21 @@ private:
     struct Node
     {
         ll value;
-        int counter{};
+        int countMinVal{};
         // Constructors
         Node() {}
         Node(ll val, int cnt)
         {
             value = val;
-            counter = cnt;
+            countMinVal = cnt;
         }
     };
     int size;
     vector<Node> seg;
-    Node merge(Node &leftNode, Node &rightNode)
+    Node merge(const Node &leftNode, const Node &rightNode)
     {
         if (leftNode.value == rightNode.value)
-        {
-            return Node(leftNode.value, leftNode.counter + rightNode.counter);
-        }
+            return Node(leftNode.value, leftNode.countMinVal + rightNode.countMinVal);
         else
         {
             if (leftNode.value < rightNode.value)
@@ -50,11 +35,11 @@ private:
                 return rightNode;
         }
     }
-    void build(int left, int right, int node, vector<ll> &arr)
+    void build(int left, int right, int node, const vector<ll> &arr)
     {
-        if (left == right) // Leaf Node (single element)
+        if (left == right)
         {
-            if (left < arr.size()) // Making sure we are inside the boundaries of the array
+            if (left < arr.size())
                 seg[node] = Node(arr[left], 1);
             return;
         }
@@ -91,18 +76,19 @@ private:
         if (left >= leftQuery && right <= rightQuery)
             return seg[node];
 
-        else // ONLY a part of this segment belongs to the query
-        {
-            Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
-            Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
-            return merge(leftSegment, rightSegment);
-        }
+        // ONLY a part of this segment belongs to the query
+        Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
+        Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
+        return merge(leftSegment, rightSegment);
     }
 
 public:
-    segmentTree(vector<ll> &arr)
+    segmentTree(const vector<ll> &arr)
     {
-        size = __bit_ceil(arr.size());
+        size = 1;
+        int n = arr.size();
+        while (size < n)
+            size <<= 1;
         seg = vector<Node>(2 * size, Node(LLONG_MAX, 1));
         build(0, size - 1, 0, arr);
     }
@@ -113,7 +99,7 @@ public:
     pair<int, int> query(int left, int right)
     {
         Node ans = query(0, size - 1, 0, left, right);
-        return {ans.value, ans.counter};
+        return {ans.value, ans.countMinVal};
     }
 
 #undef L
@@ -131,7 +117,7 @@ int main()
     freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
     int t = 1;
-    ll N, M, q, i, v, l, r;
+    ll N, M, q, i, v, L, R;
     cin >> N >> M;
     vector<ll> vc(N);
     for (int i{}; i < N; i++)
@@ -147,10 +133,11 @@ int main()
         }
         else
         {
-            cin >> l >> r;
-            pair<int, int> ans = segTree.query(l, r - 1);
-            cout << ans.first << " " << ans.second << endl;
+            cin >> L >> R;
+            auto [minVal, countMinVal] = segTree.query(L, R - 1);
+            cout << minVal << " " << countMinVal << endl;
         }
     }
+
     return 0;
 }

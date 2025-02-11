@@ -42,13 +42,11 @@ private:
     };
     ll N;
     Node *root;
-    ll merge(const ll &leftNode, const ll &rightNode)
+    void merge(Node *&segNode)
     {
-        ll res;
-        res = (leftNode + rightNode);
-        return res;
+        segNode->Value = segNode->LeftChild->Value + segNode->RightChild->Value;
     }
-    void update(int left, int right, Node *Current, int idx, const ll &newValue)
+    void update(ll left, ll right, Node *Current, ll idx, const ll &newValue)
     {
         // idx is not in range [left, right]
         if (left > idx || right < idx)
@@ -64,9 +62,9 @@ private:
         Current->createChildren();
         update(left, mid, Current->LeftChild, idx, newValue);
         update(mid + 1, right, Current->RightChild, idx, newValue);
-        Current->Value = merge(Current->LeftChild->Value, Current->RightChild->Value);
+        merge(Current);
     }
-    ll query(int left, int right, Node *Current, int leftQuery, int rightQuery)
+    ll query(ll left, ll right, Node *Current, ll leftQuery, ll rightQuery)
     {
         // [left, right] doesn't intersect with [leftQuery, rightQuery]
         if (left > rightQuery || right < leftQuery)
@@ -79,20 +77,20 @@ private:
         Current->createChildren();
         ll leftSegment = query(left, mid, Current->LeftChild, leftQuery, rightQuery);
         ll rightSegment = query(mid + 1, right, Current->RightChild, leftQuery, rightQuery);
-        return merge(leftSegment, rightSegment);
+        return (leftSegment + rightSegment);
     }
 
 public:
-    dynamicSegmentTree()
+    dynamicSegmentTree(ll rangeSize = 1e9)
     {
         root = new Node();
-        N = 1e9 + 1;
+        N = rangeSize + 1;
     }
-    void update(int idx, const ll &val)
+    void update(ll idx, const ll &val)
     {
         update(1, N, root, idx, val);
     }
-    ll query(int left, int right)
+    ll query(ll left, ll right)
     {
         ll ans = query(1, N, root, left, right);
         return ans;
