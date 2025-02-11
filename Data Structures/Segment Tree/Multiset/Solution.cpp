@@ -24,8 +24,7 @@ private:
 		res.sum = (leftNode.sum + rightNode.sum);
 		return res;
 	}
-	template <typename T>
-	void build(int left, int right, int node, vector<T> &arr)
+	void build(int left, int right, int node, const vector<ll> &arr)
 	{
 		if (left == right)
 		{
@@ -81,17 +80,14 @@ private:
 		// The whole range is the answer
 		if (left >= leftQuery && right <= rightQuery)
 			return seg[node];
-		else // ONLY a part of this segment belongs to the query
-		{
-			Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
-			Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
-			return merge(leftSegment, rightSegment);
-		}
+		// ONLY a part of this segment belongs to the query
+		Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
+		Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
+		return merge(leftSegment, rightSegment);
 	}
 
 public:
-	template <typename T>
-	segmentTree(vector<T> &arr)
+	segmentTree(const vector<ll> &arr)
 	{
 		size = 1;
 		int n = arr.size();
@@ -130,8 +126,7 @@ int main()
 	int t = 1;
 	ll N, Q, X, Ki;
 	cin >> N >> Q;
-	vector<int> vc(N + 1, 0);
-	segmentTree segTree(vc);
+	segmentTree segTree(vector<ll>(N + 1, 0));
 	for (int i{}; i < N; i++)
 	{
 		cin >> X;

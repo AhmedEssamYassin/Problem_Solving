@@ -3,19 +3,6 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-/*
-Parent Node : A node with NO parent
-Leaf Node: A node with NO children
-Siblings: Nodes that are of the same level in the heirarchy
-
-At level of Leafs, each node is responsible for one node (single element) (0 trailing zeros)
-in its higher level, each node is responsible for 2 nodes (1 trailing zero)
-in its higher level, each node is responsible for 4 nodes (2 trailing zeros)
-in its higher level, each node is responsible for 8 nodes (3 trailing zeros)
-and so on
-
-So we can alternate between levels based on the parity of number of trailing zeros.
-*/
 struct segmentTree
 {
 #define L (2 * node + 1)
@@ -47,7 +34,7 @@ private:
 		if (left == right) // Leaf Node (single element)
 		{
 			if (left < arr.size()) // Making sure we are inside the boundaries of the array
-				seg[node].countDistinct = 1, seg[node].distinct[arr[left] - 97] = 1;
+				seg[node].countDistinct = 1, seg[node].distinct[arr[left] - 'a'] = 1;
 			return;
 		}
 		// Building left node
@@ -64,9 +51,8 @@ private:
 		if (left == right)
 		{
 			seg[node].countDistinct = 1;
-			seg[node].distinct.set();
-			seg[node].distinct.flip();
-			seg[node].distinct[val - 97] = 1;
+			seg[node].distinct.reset();
+			seg[node].distinct[val - 'a'] = 1;
 			return;
 		}
 		if (idx <= mid)
@@ -86,18 +72,19 @@ private:
 		if (left >= leftQuery && right <= rightQuery)
 			return seg[node];
 
-		else // ONLY a part of this segment belongs to the query
-		{
-			Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
-			Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
-			return merge(leftSegment, rightSegment);
-		}
+		// ONLY a part of this segment belongs to the query
+		Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
+		Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
+		return merge(leftSegment, rightSegment);
 	}
 
 public:
 	segmentTree(string &arr)
 	{
-		size = __bit_ceil(arr.size());
+		size = 1;
+		int n = arr.size();
+		while (size < n)
+			size <<= 1;
 		seg = vector<Node>(2 * size, Node(0, 0));
 		build(0, size - 1, 0, arr);
 	}

@@ -77,12 +77,10 @@ private:
 		if (left >= leftQuery && right <= rightQuery)
 			return seg[node];
 
-		else // ONLY a part of this segment belongs to the query
-		{
-			Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
-			Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
-			return merge(leftSegment, rightSegment);
-		}
+		// ONLY a part of this segment belongs to the query
+		Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
+		Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
+		return merge(leftSegment, rightSegment);
 	}
 
 public:

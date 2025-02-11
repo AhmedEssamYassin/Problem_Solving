@@ -3,6 +3,20 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
+/*
+Parent Node : A node with NO parent
+Leaf Node: A node with NO children
+Siblings: Nodes that are of the same level in the heirarchy
+
+At level of Leafs, each node is responsible for one node (single element) (0 trailing zeros)
+in its higher level, each node is responsible for 2 nodes (1 trailing zero)
+in its higher level, each node is responsible for 4 nodes (2 trailing zeros)
+in its higher level, each node is responsible for 8 nodes (3 trailing zeros)
+and so on
+
+So we can alternate between levels based on the parity of number of trailing zeros.
+*/
+
 struct segmentTree
 {
 #define L (2 * node + 1)
@@ -28,8 +42,7 @@ private:
 			res.value = (leftNode.value ^ rightNode.value);
 		return res;
 	}
-	template <typename T>
-	void build(int left, int right, int node, vector<T> &arr)
+	void build(int left, int right, int node, const vector<ll> &arr)
 	{
 		if (left == right) // Leaf node (single element)
 		{
@@ -72,23 +85,20 @@ private:
 	{
 		// Out of range
 		if (right < leftQuery || left > rightQuery)
-			return Node(0); // A value that doesn't affect the answer
+			return Node(0); // A value that doesn't affect the query
 
 		// The whole range is the answer
 		if (left >= leftQuery && right <= rightQuery)
 			return seg[node];
 
-		else // ONLY a part of this segment belongs to the query
-		{
-			Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
-			Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
-			return merge(leftSegment, rightSegment, 3); // NOT reached
-		}
+		// ONLY a part of this segment belongs to the query
+		Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
+		Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
+		return merge(leftSegment, rightSegment, 3); // NOT reached
 	}
 
 public:
-	template <typename T>
-	segmentTree(vector<T> &arr)
+	segmentTree(const vector<ll> &arr)
 	{
 		size = 1;
 		int n = arr.size();
@@ -122,7 +132,7 @@ int main()
 #endif //! ONLINE_JUDGE
 	int N, M, P, B;
 	cin >> N >> M;
-	vector<int> vc(1 << N);
+	vector<ll> vc(1 << N);
 	for (int i{}; i < (1 << N); i++)
 		cin >> vc[i];
 	segmentTree segTree(vc);

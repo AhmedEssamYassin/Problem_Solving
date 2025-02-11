@@ -23,7 +23,7 @@ private:
 		{
 			memset(freq, 0, sizeof(freq));
 			invCount = 0;
-			freq[val - 97] = 1;
+			freq[val - 'a'] = 1;
 		}
 	};
 	int size;

@@ -65,18 +65,19 @@ private:
 		if (left >= leftQuery && right <= rightQuery)
 			return seg[node];
 
-		else // ONLY a part of this segment belongs to the query
-		{
-			Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
-			Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
-			return merge(leftSegment, rightSegment);
-		}
+		// ONLY a part of this segment belongs to the query
+		Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
+		Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
+		return merge(leftSegment, rightSegment);
 	}
 
 public:
 	segmentTree(const vector<ll> &arr)
 	{
-		size = __bit_ceil(arr.size());
+		size = 1;
+		int n = arr.size();
+		while (size < n)
+			size <<= 1;
 		seg = vector<Node>(2 * size, 0);
 		build(0, size - 1, 0, arr);
 	}

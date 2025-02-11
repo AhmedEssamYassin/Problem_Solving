@@ -39,17 +39,15 @@ private:
 		{
 			if (left < arr.size())
 				seg[node] = arr[left];
+			return;
 		}
-		else
-		{
-			// Recursively build the left child
-			build(left, mid, L, arr);
-			// Recursively build the right child
-			build(mid + 1, right, R, arr);
+		// Recursively build the left child
+		build(left, mid, L, arr);
+		// Recursively build the right child
+		build(mid + 1, right, R, arr);
 
-			// Merge the children values
-			seg[node] = merge(seg[L], seg[R]);
-		}
+		// Merge the children values
+		seg[node] = merge(seg[L], seg[R]);
 	}
 
 	void update(int left, int right, int node, int idx, ll val)
