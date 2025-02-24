@@ -121,6 +121,22 @@ public:
 		int k = 31 - __builtin_clz(rangeLength);
 		return min(sparseTable[left][k], sparseTable[right - (1 << k) + 1][k]);
 	}
+	// Compare two substrings of the same string in O(1)
+	bool compareSubstrings(const pair<int, int> &str1, const pair<int, int> &str2, bool equal = false) const
+	{
+		auto [i, j] = str1;
+		auto [k, l] = str2;
+
+		int len1 = j - i + 1;
+		int len2 = l - k + 1;
+		int LCP = queryLCP(i, k);
+		// Check if LCP is sufficient to determine the ordering
+		if (LCP >= min(len1, len2))
+			return (equal ? len1 >= len2 : len1 > len2);
+
+		// Otherwise, compare characters at the point of difference
+		return S[i + LCP] > S[k + LCP];
+	}
 };
 
 int pound;
