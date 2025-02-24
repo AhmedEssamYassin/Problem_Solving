@@ -3,27 +3,25 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-// Can be used for GCD, LCM, Maximum, Minimum, OR, AND queries, this code is for Range Minimum Query AKA RMQ
+ll bitCeil(const ll &N)
+{
+	ll res{1};
+	while (res < N)
+		res <<= 1;
+	return res;
+}
+
 struct sparseTable
 {
 	int size, LOG;
 	vector<vector<ll>> m;
-
-	sparseTable() {}
-	sparseTable(const vector<ll> &arr, int lg)
-	{
-		build(arr, lg);
-	}
-
+	ll (*Process)(ll, ll);
 	ll merge(const ll &a, const ll &b)
 	{
-		return gcd(a, b);
+		return Process(a, b);
 	}
-	void build(const vector<ll> &arr, int lg)
+	void build(const vector<ll> &arr)
 	{
-		int n = arr.size();
-		LOG = lg;
-		m.resize(n, vector<ll>(LOG, 0));
 		int N = arr.size();
 		for (int i{}; i < N; i++)
 			m[i][0] = arr[i];
@@ -33,16 +31,29 @@ struct sparseTable
 				m[i][k] = merge(m[i][k - 1], m[i + (1 << (k - 1))][k - 1]);
 		}
 	}
+	sparseTable(const vector<ll> &arr, ll (*func)(ll, ll))
+	{
+		int n = arr.size();
+		LOG = (ll)(log2l(bitCeil(n)) + 1) + 1;
+		Process = func;
+		m.resize(n, vector<ll>(LOG, 0));
+		build(arr);
+	}
 
 	ll query(int L, int R) // 0-based
 	{
 		if (L > R)
-			return 0;
+			return 0; // Neutral value for GCD
 		int len = R - L + 1;
 		int k = 31 - __builtin_clz(len);
 		return merge(m[L][k], m[R - (1 << k) + 1][k]);
 	}
 };
+
+ll GCD(ll a, ll b)
+{
+	return std::gcd(a, b);
+}
 
 int main()
 {
@@ -63,7 +74,7 @@ int main()
 			cin >> vc[i];
 		for (int i{1}; i < N; i++)
 			diff.push_back(abs(vc[i] - vc[i - 1]));
-		sparseTable SPT(diff, 20);
+		sparseTable SPT(diff, GCD);
 		while (Q--)
 		{
 			int L, R;

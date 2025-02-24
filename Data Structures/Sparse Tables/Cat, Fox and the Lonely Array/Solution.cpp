@@ -3,27 +3,25 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-// Can be used for GCD, LCM, Maximum, Minimum, OR, AND queries, this code is for Range Minimum Query AKA RMQ
+ll bitCeil(const ll &N)
+{
+	ll res{1};
+	while (res < N)
+		res <<= 1;
+	return res;
+}
+
 struct sparseTable
 {
 	int size, LOG;
 	vector<vector<ll>> m;
-
-	sparseTable() {}
-	sparseTable(const vector<ll> &arr, int lg)
-	{
-		build(arr, lg);
-	}
-
+	ll (*Process)(ll, ll);
 	ll merge(const ll &a, const ll &b)
 	{
-		return (a | b);
+		return Process(a, b);
 	}
-	void build(const vector<ll> &arr, int lg)
+	void build(const vector<ll> &arr)
 	{
-		int n = arr.size();
-		LOG = lg;
-		m.resize(n, vector<ll>(LOG, 0));
 		int N = arr.size();
 		for (int i{}; i < N; i++)
 			m[i][0] = arr[i];
@@ -33,6 +31,14 @@ struct sparseTable
 				m[i][k] = merge(m[i][k - 1], m[i + (1 << (k - 1))][k - 1]);
 		}
 	}
+	sparseTable(const vector<ll> &arr, ll (*func)(ll, ll))
+	{
+		int n = arr.size();
+		LOG = (ll)(log2l(bitCeil(n)) + 1) + 1;
+		Process = func;
+		m.resize(n, vector<ll>(LOG, 0));
+		build(arr);
+	}
 
 	ll query(int L, int R) // 0-based
 	{
@@ -41,6 +47,11 @@ struct sparseTable
 		return merge(m[L][k], m[R - (1 << k) + 1][k]);
 	}
 };
+
+ll OR(ll a, ll b)
+{
+	return a | b;
+}
 
 bool isOk(const vector<ll> &vc, sparseTable &ST, ll K)
 {
@@ -81,7 +92,7 @@ int main()
 		vector<ll> vc(N);
 		for (int i{}; i < N; i++)
 			cin >> vc[i];
-		sparseTable ST(vc, 21);
+		sparseTable ST(vc, OR);
 		ll L{1}, R = N, ans = N;
 		while (L <= R)
 		{

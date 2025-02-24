@@ -3,14 +3,22 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
+ll bitCeil(const ll &N)
+{
+	ll res{1};
+	while (res < N)
+		res <<= 1;
+	return res;
+}
+
 struct sparseTable
 {
 	int size, LOG;
 	vector<vector<ll>> m;
-
+	ll (*Process)(ll, ll);
 	ll merge(const ll &a, const ll &b)
 	{
-		return (a & b);
+		return Process(a, b);
 	}
 	void build(const vector<ll> &arr)
 	{
@@ -23,10 +31,11 @@ struct sparseTable
 				m[i][k] = merge(m[i][k - 1], m[i + (1 << (k - 1))][k - 1]);
 		}
 	}
-	sparseTable(const vector<ll> &arr, int lg)
+	sparseTable(const vector<ll> &arr, ll (*func)(ll, ll))
 	{
 		int n = arr.size();
-		LOG = lg;
+		LOG = (ll)(log2l(bitCeil(n)) + 1) + 1;
+		Process = func;
 		m.resize(n, vector<ll>(LOG, 0));
 		build(arr);
 	}
@@ -38,6 +47,11 @@ struct sparseTable
 		return merge(m[L][k], m[R - (1 << k) + 1][k]);
 	}
 };
+
+ll AND(ll a, ll b)
+{
+	return a & b;
+}
 
 int main()
 {
@@ -77,7 +91,7 @@ int main()
 					arr[i] |= (1LL << k);
 			}
 		}
-		sparseTable ST(arr, 20);
+		sparseTable ST(arr, AND);
 		for (auto &[l, r, q] : queries)
 			if (ST.query(l, r) != q)
 				return cout << "NO", 0;
