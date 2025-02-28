@@ -30,11 +30,10 @@ struct Trie
 		int len = 1;
 		for (const char &C : str)
 		{
-			int idx = (C - 'a'); // To be 0-based index
-			if (!cur->character[idx])
-				cur->character[idx] = new Node();
+			if (!cur->character[C])
+				cur->character[C] = new Node();
 
-			cur = cur->character[idx];
+			cur = cur->character[C];
 			LCP[len] = max(LCP[len], ++cur->prefix);
 			len++;
 		}

@@ -84,25 +84,28 @@ struct Trie
 		return true;
 	}
 
-	// Recursive function to delete a key from given Trie
-	void erase(Node *&node, int pos)
+	// Recursive function to delete a word from given Trie (Assuming it's been inserted before)
+	void erase(const string &str, int pos)
 	{
-		node->idxPref.erase(pos);
-		node->prefix--;
-		if (node->idxEnd.find(pos) != node->idxEnd.end())
+		Node *cur = root;
+		for (const char &C : str)
 		{
-			node->idxEnd.erase(pos);
-			node->isEnd--;
-			return;
+			int idx = (C - 'a');
+			cur = cur->character[idx];
+			cur->prefix--;
+			cur->idxPref.erase(pos);
 		}
-		for (auto *&child : node->character)
+		cur->isEnd--;
+		cur->idxEnd.erase(pos);
+	}
+	~Trie()
+	{
+		for (auto *&child : root->character)
 		{
-			if (child != nullptr && child->idxPref.find(pos) != child->idxPref.end())
-			{
-				erase(child, pos);
-				return;
-			}
+			if (child != nullptr)
+				delete (child);
 		}
+		delete (root);
 	}
 };
 
@@ -134,7 +137,7 @@ int main()
 			{
 				cin >> i >> s;
 				i--;
-				trie.erase(trie.root->character[vc[i][0] - 'a'], i);
+				trie.erase(vc[i], i);
 				trie.insert(s, i);
 				vc[i] = s;
 			}

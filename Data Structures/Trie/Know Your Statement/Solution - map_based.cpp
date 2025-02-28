@@ -3,7 +3,6 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-int n;
 struct Trie
 {
 	struct Node
@@ -29,11 +28,10 @@ struct Trie
 		Node *cur = root;
 		for (const char &C : str)
 		{
-			int idx = (C - 'a'); // To be 0-based index
-			if (cur->character[idx] == nullptr)
-				cur->character[idx] = new Node();
+			if (cur->character[C] == nullptr)
+				cur->character[C] = new Node();
 
-			cur = cur->character[idx];
+			cur = cur->character[C];
 			cur->prefix++;
 			cur->idxPref.insert(j); // A string of index j has a prefix at this node
 		}
@@ -47,11 +45,10 @@ struct Trie
 		Node *cur = root;
 		for (const char &C : str)
 		{
-			int idx = (C - 'a');
-			if (cur->character[idx] == nullptr)
+			if (cur->character[C] == nullptr)
 				return false;
 			// Character exists, but is it end of word?
-			cur = cur->character[idx];
+			cur = cur->character[C];
 			auto &st = cur->idxEnd;
 			if (st.lower_bound(L) != st.end() && *st.lower_bound(L) <= R)
 				return true;
@@ -61,15 +58,14 @@ struct Trie
 
 	// Checks if `str` is a prefix of any string (or in range [L, R])
 	// Can also return a boolean, or even the actual number of string having `str` as a prefix
-	ll checkPrefix(const string &str, int L = 0, int R = n - 1)
+	ll checkPrefix(const string &str, int L, int R)
 	{
 		Node *cur = root;
 		for (const char &C : str)
 		{
-			int idx = (C - 'a');
-			if (cur->character[idx] == nullptr)
+			if (cur->character[C] == nullptr)
 				return false;
-			cur = cur->character[idx];
+			cur = cur->character[C];
 		}
 		auto &st = cur->idxPref;
 		return (st.lower_bound(L) != st.end() && *st.lower_bound(L) <= R);
@@ -82,25 +78,18 @@ struct Trie
 		return root->character.empty();
 	}
 
-	// Recursive function to delete a key from given Trie
-	void erase(Node *&node, int pos)
+	// Recursive function to delete a word from given Trie (Assuming it's been inserted before)
+	void erase(const string &str, int pos)
 	{
-		node->idxPref.erase(pos);
-		node->prefix--;
-		if (node->idxEnd.find(pos) != node->idxEnd.end())
+		Node *cur = root;
+		for (const char &C : str)
 		{
-			node->idxEnd.erase(pos);
-			node->isEnd--;
-			return;
+			cur = cur->character[C];
+			cur->prefix--;
+			cur->idxPref.erase(pos);
 		}
-		for (auto &[character, node] : node->character)
-		{
-			if (node != nullptr && node->idxPref.find(pos) != node->idxPref.end())
-			{
-				erase(node, pos);
-				return;
-			}
-		}
+		cur->isEnd--;
+		cur->idxEnd.erase(pos);
 	}
 	~Trie()
 	{
@@ -138,7 +127,7 @@ int main()
 			{
 				cin >> i >> s;
 				i--;
-				trie.erase(trie.root->character[vc[i][0] - 'a'], i);
+				trie.erase(vc[i], i);
 				trie.insert(s, i);
 				vc[i] = s;
 			}

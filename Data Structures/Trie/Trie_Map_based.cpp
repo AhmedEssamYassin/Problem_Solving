@@ -29,11 +29,10 @@ struct Trie
         Node *cur = root;
         for (const char &C : str)
         {
-            int idx = (C - 'a'); // To be 0-based index
-            if (cur->character[idx] == nullptr)
-                cur->character[idx] = new Node();
+            if (cur->character[C] == nullptr)
+                cur->character[C] = new Node();
 
-            cur = cur->character[idx];
+            cur = cur->character[C];
             cur->prefix++;
             cur->idxPref.insert(j); // A string of index j has a prefix at this node
         }
@@ -47,11 +46,10 @@ struct Trie
         Node *cur = root;
         for (const char &C : str)
         {
-            int idx = (C - 'a');
-            if (cur->character[idx] == nullptr)
+            if (cur->character[C] == nullptr)
                 return false;
             // Character exists, but is it end of word?
-            cur = cur->character[idx];
+            cur = cur->character[C];
             auto &st = cur->idxEnd;
             if (st.lower_bound(L) != st.end() && *st.lower_bound(L) <= R)
                 return true;
@@ -66,14 +64,13 @@ struct Trie
         Node *cur = root;
         for (const char &C : str)
         {
-            int idx = (C - 'a');
-            if (cur->character[idx] == nullptr)
+            if (cur->character[C] == nullptr)
                 return false;
-            cur = cur->character[idx];
+            cur = cur->character[C];
         }
-        auto &st = cur->idxPref;
-        return (st.lower_bound(L) != st.end() && *st.lower_bound(L) <= R);
-        // return cur->prefix;
+        // auto &st = cur->idxPref;
+        // return (st.lower_bound(L) != st.end() && *st.lower_bound(L) <= R);
+        return cur->prefix;
     }
 
     // Checks if a node is a leaf node (doesn't have any children)
@@ -82,25 +79,18 @@ struct Trie
         return root->character.empty();
     }
 
-    // Recursive function to delete a key from given Trie
-    void erase(Node *&node, int pos)
+    // Recursive function to delete a word from given Trie (Assuming it's been inserted before)
+    void erase(const string &str, int pos)
     {
-        node->idxPref.erase(pos);
-        node->prefix--;
-        if (node->idxEnd.find(pos) != node->idxEnd.end())
+        Node *cur = root;
+        for (const char &C : str)
         {
-            node->idxEnd.erase(pos);
-            node->isEnd--;
-            return;
+            cur = cur->character[C];
+            cur->prefix--;
+            cur->idxPref.erase(pos);
         }
-        for (auto &[character, node] : node->character)
-        {
-            if (node != nullptr && node->idxPref.find(pos) != node->idxPref.end())
-            {
-                erase(node, pos);
-                return;
-            }
-        }
+        cur->isEnd--;
+        cur->idxEnd.erase(pos);
     }
     ~Trie()
     {

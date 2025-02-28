@@ -27,11 +27,10 @@ struct Trie
         Node *cur = root;
         for (const char &C : str)
         {
-            int idx = (C - 'a'); // To be 0-based index
-            if (cur->character[idx] == nullptr)
-                cur->character[idx] = new Node();
+            if (cur->character[C] == nullptr)
+                cur->character[C] = new Node();
 
-            cur = cur->character[idx];
+            cur = cur->character[C];
             cur->prefix++;
         }
         cur->isEnd++;
@@ -43,10 +42,9 @@ struct Trie
         Node *cur = root;
         for (const char &C : str)
         {
-            int idx = (C - 'a');
-            if (cur->character[idx] == nullptr)
+            if (cur->character[C] == nullptr)
                 return 0;
-            cur = cur->character[idx];
+            cur = cur->character[C];
         }
         return cur->prefix;
     }
