@@ -163,7 +163,7 @@ int main()
 		string arr[2];
 		cin >> arr[0] >> arr[1];
 		string str;
-		str = arr[0] + '#' + arr[1];
+		str = arr[0] + '#' + arr[1] + '$';
 		pound = arr[0].length();
 
 		SuffixArray suffArr(str, true);
