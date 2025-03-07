@@ -21,8 +21,7 @@ struct Edge
 	}
 };
 
-vector<ll> dist;
-void Dijkstra(const vector<Edge> adj[], int N, int src, int K)
+void Dijkstra(const vector<Edge> adj[], vector<ll> &dist, int N, int src, int K)
 {
 	vector<ll> parent(N + 1, -1);
 	dist.assign(N + 1, INF);
@@ -61,16 +60,17 @@ int main()
 	while (t--)
 	{
 		cin >> N >> M >> K >> S;
-		vector<Edge> graph[N + 1];
+		vector<Edge> adj[N + 1];
 		while (M--)
 		{
 			ll u, v, w;
 			cin >> u >> v >> w;
-			graph[u].push_back({v, w, 0, 0});
-			// If the Graph is Undirected
-			graph[v].push_back({u, 2 * w, 0, 1});
+			adj[u].push_back({v, w, 0, 0});
+			// The reverse edge is double the original weight
+			adj[v].push_back({u, 2 * w, 0, 1});
 		}
-		Dijkstra(graph, N, S, K);
+		vector<ll> dist;
+		Dijkstra(adj, dist, N, S, K);
 		cin >> Q;
 		while (Q--)
 		{

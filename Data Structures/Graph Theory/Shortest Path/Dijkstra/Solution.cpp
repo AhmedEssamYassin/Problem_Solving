@@ -2,41 +2,39 @@
 using namespace std;
 #define ll long long int
 #define endl "\n"
+#define INF LLONG_MAX
 
 struct Edge
 {
 	ll node = -1;
+	ll cost = INF;
 	ll par = -1; // parent
-	ll cost = LLONG_MAX;
 	Edge(ll node, ll weight, ll par = -1) : node(node), cost(weight), par(par) {}
-	bool operator<(const Edge &E) const { return cost > E.cost; }
+	bool operator<(const Edge &E) const
+	{
+		return cost > E.cost;
+	}
 };
 
-void Dijkstra(const vector<Edge> graph[], int N, int src, int dest)
+void Dijkstra(const vector<Edge> adj[], vector<ll> &dist, int N, int src, int dest)
 {
-	vector<ll> dist(N + 1, LLONG_MAX), parent(N + 1, -1);
+	dist.assign(N + 1, INF);
+	vector<ll> parent(N + 1, -1);
 	priority_queue<Edge> prQue;
 	prQue.emplace(src, 0);
 	while (!prQue.empty())
 	{
-		Edge cur = prQue.top();
+		auto [curNode, curCost, par] = prQue.top();
 		prQue.pop();
-		/*
-		If we want the cost of the shortest path from src to dest
 
-		if (cur.node == dest)
-			return void(cout << cur.cost << endl);
-		*/
-		if (dist[cur.node] != LLONG_MAX)
+		if (dist[curNode] != INF)
 			continue;
-		dist[cur.node] = cur.cost;
-		parent[cur.node] = cur.par;
-		for (const Edge &v : graph[cur.node])
-			if (dist[v.node] == LLONG_MAX)
-				prQue.emplace(v.node, v.cost + cur.cost, cur.node);
+		dist[curNode] = curCost;
+		parent[curNode] = par;
+		for (const Edge &v : adj[curNode])
+			if (dist[v.node] == INF)
+				prQue.emplace(v.node, v.cost + curCost, curNode);
 	}
-	// If there were NO path from src to dest
-	// return void(cout << "NO\n");
 	vector<ll> path;
 	ll temp = dest;
 	while (parent[temp] != -1)
@@ -68,16 +66,17 @@ int main()
 	while (t--)
 	{
 		cin >> N >> M;
-		vector<Edge> graph[N + 1];
+		vector<Edge> adj[N + 1];
 		while (M--)
 		{
 			ll u, v, w;
 			cin >> u >> v >> w;
-			graph[u].push_back({v, w});
+			adj[u].push_back({v, w});
 			// If the Graph is Undirected
-			graph[v].push_back({u, w});
+			adj[v].push_back({u, w});
 		}
-		Dijkstra(graph, N, 1, N);
+		vector<ll> dist;
+		Dijkstra(adj, dist, N, 1, N);
 	}
 	return 0;
 }

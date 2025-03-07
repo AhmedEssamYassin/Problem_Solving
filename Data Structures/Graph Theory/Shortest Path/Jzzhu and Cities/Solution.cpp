@@ -17,9 +17,8 @@ struct Edge
 		return cost > E.cost;
 	}
 };
-vector<ll> dist;
 ll ans;
-void Dijkstra(const vector<Edge> adj[], int N, int src)
+void Dijkstra(const vector<Edge> adj[], vector<ll> &dist, int N, int src)
 {
 	dist.assign(N + 1, INF);
 	priority_queue<Edge> prQue;
@@ -69,7 +68,8 @@ int main()
 			cin >> s >> y;
 			adj[1].push_back({s, y, 1});
 		}
-		Dijkstra(adj, N, 1);
+		vector<ll> dist;
+		Dijkstra(adj, dist, N, 1);
 		cout << ans;
 	}
 	return 0;
