@@ -71,7 +71,7 @@ Node *merge(Node *leftNode, Node *rightNode, bool in_place = 0, Node *Current = 
 	}
 }
 
-Node *insert(Node *node, int left, int right, int i, int j, int state)
+Node *insert(Node *node, int left, int right, int i, int j, int state) // Update for a single version
 {
 	if (left <= i && right >= i)
 	{
@@ -106,28 +106,6 @@ Node *insert(Node *node, int left, int right, int i, int j, int state)
 	return node;
 }
 
-void update(Node *Current, int left, int right, int idx, const ll &val)
-{
-	// idx is not in range [left, right]
-	if (left > idx || right < idx)
-		return;
-
-	// Current is the Node that manage only ith element
-	if (left == right)
-	{
-		Current->Value += val;
-		return;
-	}
-
-	Current->createChildren();
-	if (idx <= mid)
-		update(Current->LeftChild, left, mid, idx, val);
-	else
-		update(Current->RightChild, mid + 1, right, idx, val);
-	// Don't change the node, change the value at this node
-	Current = merge(Current->LeftChild, Current->RightChild, 1, Current);
-}
-
 ll query(Node *Current, int left, int right, int leftQuery, int rightQuery)
 {
 	// [left, right] doesn't intersect with [leftQuery, rightQuery]
@@ -148,11 +126,6 @@ ll query(Node *Current, int left, int right, int leftQuery, int rightQuery)
 Node *insert(Node *Current, int i, int j, int state)
 {
 	return insert(Current, 1, N, i, j, state);
-}
-
-void update(Node *Current, int idx, const ll &val)
-{
-	update(Current, 1, N, idx, val);
 }
 
 ll query(Node *Current, int left, int right)
